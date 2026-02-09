@@ -1,19 +1,19 @@
 # HabitForge
 Adaptive habit-tracking platform with gamification &amp; social accountability
-# HabitForge: Adaptive Habit-Tracking Platform 🚀
+# HabitForge: Adaptive Habit-Tracking Platform 
 
 > **A complete habit-tracking system designed for Gen Z with personalized gamification and social accountability**
 
-## 📋 Project Overview
+##  Project Overview
 
 HabitForge is an adaptive habit-tracking platform featuring three distinct behavioral modes with personalized gamification and social accountability systems tailored for Gen Z users.
 
-### 🎯 Three Behavioral Modes
+###  Three Behavioral Modes
 - **Discipline Mode**: Strict tracking with high XP multipliers and penalties
 - **Balanced Mode**: Flexible tracking with moderate rewards
 - **Competitive Mode**: Time-based bonuses and social competition features
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -39,7 +39,7 @@ HabitForge is an adaptive habit-tracking platform featuring three distinct behav
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🛠️ Services Breakdown
+##  Services Breakdown
 
 ### 1. **API Gateway Service** (`:3000`)
 - Single entry point for all client requests
@@ -71,7 +71,7 @@ HabitForge is an adaptive habit-tracking platform featuring three distinct behav
 - Async job processing with Redis Queue (BullMQ)
 - **Database**: MongoDB (`analyticsCache`, `aggregates`)
 
-## 🗃️ Data Storage
+##  Data Storage
 
 ### Primary Database: MongoDB
 - **User Service**: `users`, `sessions`
@@ -85,9 +85,9 @@ HabitForge is an adaptive habit-tracking platform featuring three distinct behav
 - Rate limiting implementation
 - Async job queues for background processing
 
-## ⚡ Core Features
+##  Core Features
 
-### 🎮 Gamification System
+###  Gamification System
 - **XP Calculation** based on:
   - Habit difficulty (1-5)
   - Current streak length
@@ -97,19 +97,19 @@ HabitForge is an adaptive habit-tracking platform featuring three distinct behav
 - **Streak tracking** with decay algorithms
 - **Momentum scoring**
 
-### 👥 Social & Competitive Features
+###  Social & Competitive Features
 - **Club System**: Public/Private/Invite-only clubs
 - **Leaderboards**: Global, club-specific, and time-based rankings
 - **Progress Sharing**: Controlled visibility within clubs
 - **Activity Feeds**: Club member updates and achievements
 
-### 📊 Analytics & Insights
+###  Analytics & Insights
 - **Habit completion trends** and heatmaps
 - **Consistency scoring algorithms**
 - **Progress visualization** data
 - **Weekly summary generation**
 
-## 🔄 System Flows
+##  System Flows
 
 ### Flow 1: User Habit Logging
 ```
@@ -141,21 +141,21 @@ User requests mode change →
 5. Notify relevant services
 ```
 
-## 🛡️ Security & Performance
+##  Security & Performance
 
-### 🔒 Security Features
+###  Security Features
 - JWT-based authentication with Redis token storage
 - Role-based access control for club management
 - Mode-based rate limiting using token bucket algorithm
 - CORS management and security headers
 
-### ⚡ Performance Optimizations
+###  Performance Optimizations
 - **Aggressive caching** with smart invalidation rules
 - **Redis clustering** for high availability
 - **Database sharding** strategy (by userId, clubId)
 - **Eventual consistency model** for gamification updates
 
-## 🚀 Deployment
+##  Deployment
 
 ### Development Environment
 ```yaml
@@ -177,7 +177,7 @@ services:
 - **Nginx ingress controller** for load balancing
 - **Autoscaling** based on CPU, memory, and custom metrics
 
-## 📈 Monitoring & Metrics
+##  Monitoring & Metrics
 
 ### Health Checks
 - `/health`: Service status, database connectivity, uptime
@@ -188,7 +188,7 @@ services:
 - **Business**: Daily active users, habit completion rates, club engagement
 - **Performance**: Database query times, Redis latency, API throughput
 
-## 🎯 Design Decisions & Trade-offs
+##  Design Decisions & Trade-offs
 
 | Decision | Trade-off | Benefit |
 |----------|-----------|---------|
@@ -197,7 +197,7 @@ services:
 | **Eventual consistency for gamification** | Immediate consistency vs performance | Better UX, acceptable XP delay |
 | **MongoDB for all services** | Not perfect fit for all vs simplicity | Single technology stack |
 
-## 📊 Success Metrics
+##  Success Metrics
 
 ### Technical Goals
 - API response time < 200ms (p95)
@@ -211,7 +211,7 @@ services:
 - Strong club engagement metrics
 - Positive mode switching patterns
 
-## 🔮 Future Enhancements
+##  Future Enhancements
 
 ### Short-term (Post-MVP)
 - Mobile app with offline sync capability
@@ -238,7 +238,7 @@ habitforge/
 └── kubernetes/          # Production deployment files
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js 18+
