@@ -230,6 +230,51 @@ export async function getClubHabits(req: AuthRequest, res: Response, next: NextF
 }
 
 /**
+ * Delete a club habit (owner/admin only)
+ */
+export async function deleteClubHabit(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+        const { clubId, habitId } = req.params;
+        const userId = req.user!.userId;
+
+        const result = await clubService.deleteClubHabit(clubId, habitId, userId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Habit deleted from club',
+            data: result
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Failed to delete habit'
+        });
+    }
+}
+
+/**
+ * Get invite code for a private club (owner/admin only)
+ */
+export async function getClubInviteCode(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+        const { clubId } = req.params;
+        const userId = req.user!.userId;
+
+        const inviteCode = await clubService.getClubInviteCode(clubId, userId);
+
+        res.status(200).json({
+            success: true,
+            data: { inviteCode }
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Failed to get invite code'
+        });
+    }
+}
+
+/**
  * Accept a club habit
  */
 export async function acceptClubHabit(req: AuthRequest, res: Response, next: NextFunction) {

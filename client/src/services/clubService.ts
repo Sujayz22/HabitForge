@@ -16,6 +16,28 @@ export interface Club {
     role?: string
 }
 
+export interface ClubMember {
+    _id: string
+    userId: string
+    username: string
+    role: string
+    joinedAt?: string
+    currentStreak?: number
+    totalCompletions?: number
+}
+
+export interface ClubHabit {
+    _id: string
+    clubId: string
+    name: string
+    description?: string
+    category?: string
+    frequency?: string
+    difficulty?: number
+    createdBy?: string
+    createdAt?: string
+}
+
 const clubService = {
     getPublicClubs: async (): Promise<Club[]> => {
         try {
@@ -44,6 +66,47 @@ const clubService = {
         }
     },
 
+    getClub: async (clubId: string): Promise<Club> => {
+        const response = await api.get(`/clubs/${clubId}`)
+        return response.data.data || response.data
+    },
+
+    getClubMembers: async (clubId: string): Promise<ClubMember[]> => {
+        try {
+            const response = await api.get(`/clubs/${clubId}/members`)
+            return response.data.data || response.data || []
+        } catch {
+            return []
+        }
+    },
+
+    getClubHabits: async (clubId: string): Promise<ClubHabit[]> => {
+        try {
+            const response = await api.get(`/clubs/${clubId}/habits`)
+            return response.data.data || response.data || []
+        } catch {
+            return []
+        }
+    },
+
+    acceptClubHabit: async (clubId: string, habitId: string): Promise<void> => {
+        await api.post(`/clubs/${clubId}/habits/${habitId}/accept`)
+    },
+
+    addClubHabit: async (clubId: string, data: Partial<ClubHabit>): Promise<ClubHabit> => {
+        const response = await api.post(`/clubs/${clubId}/habits`, data)
+        return response.data.data || response.data
+    },
+
+    deleteClubHabit: async (clubId: string, habitId: string): Promise<void> => {
+        await api.delete(`/clubs/${clubId}/habits/${habitId}`)
+    },
+
+    getClubInviteCode: async (clubId: string): Promise<string> => {
+        const response = await api.get(`/clubs/${clubId}/invite-code`)
+        return (response.data.data || response.data).inviteCode
+    },
+
     createClub: async (data: Partial<Club>): Promise<Club> => {
         const response = await api.post("/clubs", data)
         return response.data.data || response.data
@@ -55,11 +118,6 @@ const clubService = {
 
     leaveClub: async (clubId: string): Promise<void> => {
         await api.post(`/clubs/${clubId}/leave`)
-    },
-
-    getClub: async (clubId: string): Promise<Club> => {
-        const response = await api.get(`/clubs/${clubId}`)
-        return response.data.data || response.data
     },
 }
 

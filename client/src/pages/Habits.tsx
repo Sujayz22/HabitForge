@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { habitService, type Habit } from "@/services/habitService"
-import { Plus, Flame, Zap, Pencil, Trash2, CheckCircle2, Lock, Shield, Swords } from "lucide-react"
+import { clubService, type Club, type ClubHabit } from "@/services/clubService"
+import { useNavigate } from "react-router-dom"
+import { Plus, Flame, Zap, Pencil, Trash2, CheckCircle2, Lock, Shield, Swords, Target, ExternalLink } from "lucide-react"
 
 const CATEGORIES = ["HEALTH", "LEARNING", "PRODUCTIVITY", "SOCIAL", "MINDFULNESS", "OTHER"]
 const FREQUENCIES = ["DAILY", "WEEKLY", "CUSTOM"]
@@ -17,11 +19,13 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const categoryColors: Record<string, string> = {
     HEALTH: "#13ec6a", LEARNING: "#3b82f6", PRODUCTIVITY: "#f59e0b",
     SOCIAL: "#ec4899", MINDFULNESS: "#8b5cf6", OTHER: "#6b7280",
+    FITNESS: "#13ec6a",
 }
 const categoryBg: Record<string, string> = {
     HEALTH: "rgba(19,236,106,0.12)", LEARNING: "rgba(59,130,246,0.12)",
     PRODUCTIVITY: "rgba(245,158,11,0.12)", SOCIAL: "rgba(236,72,153,0.12)",
     MINDFULNESS: "rgba(139,92,246,0.12)", OTHER: "rgba(107,114,128,0.12)",
+    FITNESS: "rgba(19,236,106,0.12)",
 }
 
 const modes = [
@@ -35,8 +39,100 @@ const emptyForm = {
     difficulty: 2, targetValue: 1, targetDays: [] as number[],
 }
 
+// ── Club Challenges Section Component ─────────────────────────
+interface ClubSectionProps {
+    club: Club
+    logs: any[]
+    todayStr: string
+    onLogHabit: (id: string) => void
+    completingId: string | null
+    navigate: ReturnType<typeof useNavigate>
+}
+
+function ClubHabitsCard({ club, logs, todayStr, onLogHabit, completingId, navigate }: ClubSectionProps) {
+    const { data: habits = [], isLoading } = useQuery<ClubHabit[]>({
+        queryKey: ["club-habits", club._id],
+        queryFn: () => clubService.getClubHabits(club._id),
+        staleTime: 60_000,
+    })
+
+    const acceptMutation = useMutation({
+        mutationFn: (habitId: string) => clubService.acceptClubHabit(club._id, habitId),
+        onSuccess: () => { },
+    })
+
+    if (isLoading || habits.length === 0) return null
+
+    const todayCompletedIds = new Set(
+        logs.filter((l: any) => l.completedAt?.slice(0, 10) === todayStr).map((l: any) => l.habitId)
+    )
+
+    return (
+        <div className="surface-card p-5">
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4" style={{ color: "var(--green)" }} />
+                    <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 60%)" }}>
+                        {club.name} · Club Challenges
+                    </h3>
+                </div>
+                <button onClick={() => navigate(`/clubs/${club._id}`)}
+                    className="flex items-center gap-1 text-xs transition-colors"
+                    style={{ color: "var(--green)" }}>
+                    View Club <ExternalLink className="h-3 w-3" />
+                </button>
+            </div>
+            <div className="flex flex-col gap-2">
+                {habits.map((habit) => {
+                    const hColor = categoryColors[habit.category || "OTHER"] || "#6b7280"
+                    const hBg = categoryBg[habit.category || "OTHER"] || "rgba(107,114,128,0.12)"
+                    const done = todayCompletedIds.has(habit._id)
+                    const isCompleting = completingId === habit._id
+
+                    return (
+                        <div key={habit._id} className="flex items-center gap-3 p-3 rounded-xl"
+                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 12% 14%)" }}>
+                            <button
+                                className={`complete-btn ${done ? "completed" : ""}`}
+                                disabled={done || isCompleting}
+                                onClick={() => { if (!done) onLogHabit(habit._id) }}
+                                title={done ? "Completed today" : "Mark as done"}>
+                                {done && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                            </button>
+                            <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{ background: hBg, color: hColor }}>
+                                <Target className="h-4 w-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className={`text-sm font-semibold truncate ${done ? "line-through opacity-50" : ""}`}
+                                    style={{ color: "hsl(150 10% 90%)" }}>{habit.name}</div>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-xs px-1.5 py-0.5 rounded font-semibold"
+                                        style={{ background: hBg, color: hColor }}>{habit.category}</span>
+                                    <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.frequency}</span>
+                                </div>
+                            </div>
+                            {!done && (
+                                <button onClick={() => acceptMutation.mutate(habit._id)}
+                                    disabled={acceptMutation.isPending}
+                                    className="flex-shrink-0 text-xs px-2 py-1 rounded-lg font-semibold disabled:opacity-40"
+                                    style={{ background: "var(--green-dim)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}
+                                    title="Add to My Habits">
+                                    <Plus className="h-3 w-3" />
+                                </button>
+                            )}
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+// ─────────────────────────────────────────────────────────────
 export function Habits() {
     const queryClient = useQueryClient()
+    const navigate = useNavigate()
     const [showCreate, setShowCreate] = useState(false)
     const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
     const [completingId, setCompletingId] = useState<string | null>(null)
@@ -51,6 +147,12 @@ export function Habits() {
         queryKey: ["logs"],
         queryFn: habitService.getLogs,
         staleTime: 30_000,
+    })
+
+    // User's clubs for Club Challenges section
+    const { data: myClubs = [] } = useQuery<Club[]>({
+        queryKey: ["clubs", "my"],
+        queryFn: clubService.getMyClubs,
     })
 
     const closeForm = () => {
@@ -71,7 +173,7 @@ export function Habits() {
         mutationFn: ({ id, data }: { id: string; data: Partial<Habit> }) => habitService.updateHabit(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["habits"] })
-            closeForm()  // Fix: also close form and reset on successful update
+            closeForm()
         },
     })
 
@@ -93,13 +195,12 @@ export function Habits() {
 
     const todayStr = new Date().toISOString().slice(0, 10)
     const todayCompletedIds = new Set(
-        logs.filter((l: any) => l.completedAt?.slice(0, 10) === todayStr).map((l: any) => l.habitId)
+        (logs as any[]).filter((l: any) => l.completedAt?.slice(0, 10) === todayStr).map((l: any) => l.habitId)
     )
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         const payload = { ...form }
-        // Only send targetDays if frequency is CUSTOM
         if (form.frequency !== "CUSTOM") {
             payload.targetDays = []
         }
@@ -213,53 +314,38 @@ export function Habits() {
                                         <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Frequency</label>
                                         <select
                                             value={form.frequency}
-                                            onChange={e => setForm(f => ({ ...f, frequency: e.target.value, targetDays: [] }))}
+                                            onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                                             style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
                                         >
                                             {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
                                     </div>
-
-                                    {/* Custom Days Picker — shown only when CUSTOM frequency is selected */}
+                                    {/* Custom days selector */}
                                     {form.frequency === "CUSTOM" && (
                                         <div className="col-span-2">
-                                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                                Select Days *
-                                            </label>
-                                            <div className="flex gap-2 flex-wrap">
-                                                {DAYS.map((day, idx) => {
-                                                    const selected = form.targetDays.includes(idx)
-                                                    return (
-                                                        <button
-                                                            type="button"
-                                                            key={day}
-                                                            onClick={() => toggleDay(idx)}
-                                                            className="w-10 h-10 rounded-lg text-xs font-bold transition-all"
-                                                            style={{
-                                                                background: selected ? "var(--green)" : "hsl(150 15% 10%)",
-                                                                color: selected ? "hsl(150 30% 4%)" : "hsl(150 10% 55%)",
-                                                                border: selected ? "none" : "1px solid hsl(150 15% 16%)",
-                                                            }}
-                                                        >
-                                                            {day}
-                                                        </button>
-                                                    )
-                                                })}
+                                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Select Days</label>
+                                            <div className="flex gap-1 flex-wrap">
+                                                {DAYS.map((day, idx) => (
+                                                    <button key={idx} type="button"
+                                                        onClick={() => toggleDay(idx)}
+                                                        className="px-2 py-1 rounded-lg text-xs font-semibold transition-all"
+                                                        style={{
+                                                            background: form.targetDays.includes(idx) ? "var(--green-dim)" : "hsl(150 15% 10%)",
+                                                            color: form.targetDays.includes(idx) ? "var(--green)" : "hsl(150 10% 50%)",
+                                                            border: form.targetDays.includes(idx) ? "1px solid rgba(19,236,106,0.3)" : "1px solid hsl(150 15% 16%)"
+                                                        }}>
+                                                        {day}
+                                                    </button>
+                                                ))}
                                             </div>
-                                            {form.targetDays.length === 0 && (
-                                                <p className="text-xs mt-1" style={{ color: "hsl(0 60% 55%)" }}>
-                                                    Please select at least one day
-                                                </p>
-                                            )}
                                         </div>
                                     )}
-
                                     <div>
                                         <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
                                         <select
                                             value={form.difficulty}
-                                            onChange={e => setForm(f => ({ ...f, difficulty: parseInt(e.target.value) }))}
+                                            onChange={e => setForm(f => ({ ...f, difficulty: Number(e.target.value) }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                                             style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
                                         >
@@ -271,42 +357,32 @@ export function Habits() {
                                         <input
                                             type="number" min={1}
                                             value={form.targetValue}
-                                            onChange={e => setForm(f => ({ ...f, targetValue: parseInt(e.target.value) || 1 }))}
+                                            onChange={e => setForm(f => ({ ...f, targetValue: Number(e.target.value) }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                                             style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
                                         />
                                     </div>
                                 </div>
-                                <div className="flex gap-2 mt-1">
+                                <div className="flex gap-2 mt-2">
                                     <button type="submit"
-                                        disabled={
-                                            createMutation.isPending || updateMutation.isPending ||
-                                            (form.frequency === "CUSTOM" && form.targetDays.length === 0)
-                                        }
-                                        className="px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                                        disabled={createMutation.isPending || updateMutation.isPending}
+                                        className="flex-1 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
                                         style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
                                         {editingHabit
-                                            ? (updateMutation.isPending ? "Saving..." : "Update Protocol")
-                                            : (createMutation.isPending ? "Creating..." : "Create Protocol")}
+                                            ? (updateMutation.isPending ? "Saving..." : "Save Changes")
+                                            : (createMutation.isPending ? "Creating..." : "Create Habit")}
                                     </button>
                                     <button type="button" onClick={closeForm}
                                         className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                        style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 70%)" }}>
+                                        style={{ background: "hsl(150 15% 10%)", color: "hsl(150 10% 60%)" }}>
                                         Cancel
                                     </button>
                                 </div>
-                                {(createMutation.error || updateMutation.error) && (
-                                    <div className="text-xs text-red-400 mt-1">
-                                        {(createMutation.error as any)?.response?.data?.message ||
-                                            (updateMutation.error as any)?.response?.data?.message ||
-                                            "Failed to save habit"}
-                                    </div>
-                                )}
                             </form>
                         </div>
                     )}
 
-                    {/* Habits List */}
+                    {/* Personal Habits List */}
                     <div className="surface-card p-5">
                         <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 60%)" }}>
                             Active Protocols ({habits.length})
@@ -382,6 +458,26 @@ export function Habits() {
                             </div>
                         )}
                     </div>
+
+                    {/* ── Club Challenges ── */}
+                    {myClubs.length > 0 && (
+                        <div className="flex flex-col gap-3">
+                            <h3 className="text-xs font-bold uppercase tracking-wider px-1" style={{ color: "hsl(150 10% 40%)" }}>
+                                🏆 Club Challenges
+                            </h3>
+                            {myClubs.map(club => (
+                                <ClubHabitsCard
+                                    key={club._id}
+                                    club={club}
+                                    logs={logs as any[]}
+                                    todayStr={todayStr}
+                                    onLogHabit={(id) => { setCompletingId(id); logMutation.mutate(id) }}
+                                    completingId={completingId}
+                                    navigate={navigate}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Mode Selector */}

@@ -7,6 +7,7 @@ import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
 import { Habits } from "@/pages/Habits"
 import { Clubs } from "@/pages/Clubs"
+import { ClubDetail } from "@/pages/ClubDetail"
 import { Analytics } from "@/pages/Analytics"
 import { Settings } from "@/pages/Settings"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -38,6 +39,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/habits" element={<Habits />} />
               <Route path="/clubs" element={<Clubs />} />
+              <Route path="/clubs/:clubId" element={<ClubDetail />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
             </Route>

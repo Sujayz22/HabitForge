@@ -198,6 +198,38 @@ export async function addClubHabit(clubId: string, userId: string, habitData: an
 }
 
 /**
+ * Delete a club habit
+ */
+export async function deleteClubHabit(clubId: string, habitId: string, userId: string) {
+    const membership = await Membership.findOne({ clubId, userId });
+    if (!membership || (membership.role !== MemberRole.OWNER && membership.role !== MemberRole.ADMIN)) {
+        throw new Error('Only club owners and admins can delete habits');
+    }
+
+    const clubHabit = await ClubHabit.findById(habitId);
+    if (!clubHabit || clubHabit.clubId !== clubId) {
+        throw new Error('Club habit not found');
+    }
+
+    await ClubHabit.deleteOne({ _id: habitId });
+    return { deleted: true };
+}
+
+/**
+ * Get invite code for a private club (owner/admin only)
+ */
+export async function getClubInviteCode(clubId: string, userId: string) {
+    const membership = await Membership.findOne({ clubId, userId });
+    if (!membership || (membership.role !== MemberRole.OWNER && membership.role !== MemberRole.ADMIN)) {
+        throw new Error('Only club owners and admins can view the invite code');
+    }
+    const club = await Club.findById(clubId);
+    if (!club) throw new Error('Club not found');
+    if (club.isPublic) throw new Error('Public clubs do not have invite codes');
+    return club.inviteCode;
+}
+
+/**
  * Get club habits
  */
 export async function getClubHabits(clubId: string) {

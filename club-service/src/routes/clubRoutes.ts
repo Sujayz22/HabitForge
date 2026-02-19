@@ -21,8 +21,12 @@ router.get('/clubs/:clubId/members', clubController.getClubMembers);
 // Club habits
 router.post('/clubs/:clubId/habits', clubController.addClubHabit);
 router.get('/clubs/:clubId/habits', clubController.getClubHabits);
+router.delete('/clubs/:clubId/habits/:habitId', clubController.deleteClubHabit);
 router.post('/clubs/:clubId/habits/:habitId/accept', clubController.acceptClubHabit);
 router.get('/clubs/:clubId/accepted-habits', clubController.getUserAcceptedHabits);
+
+// Invite code
+router.get('/clubs/:clubId/invite-code', clubController.getClubInviteCode);
 
 // Activity and chat
 router.get('/clubs/:clubId/activity', clubController.getClubActivity);
