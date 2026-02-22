@@ -5,7 +5,7 @@ export interface IActivityLog extends Document {
     userId: string;
     username: string;
     habitName: string;
-    action: 'LOGGED' | 'JOINED' | 'LEFT' | 'ACCEPTED_TASK';
+    action: 'LOGGED' | 'JOINED' | 'LEFT' | 'ACCEPTED_TASK' | 'COMPLETED_HABIT';
     notes?: string;
     timestamp: Date;
 }
@@ -30,7 +30,7 @@ const ActivityLogSchema = new Schema<IActivityLog>({
     action: {
         type: String,
         required: true,
-        enum: ['LOGGED', 'JOINED', 'LEFT', 'ACCEPTED_TASK']
+        enum: ['LOGGED', 'JOINED', 'LEFT', 'ACCEPTED_TASK', 'COMPLETED_HABIT']
     },
     notes: {
         type: String

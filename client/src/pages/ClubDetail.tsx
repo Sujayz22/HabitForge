@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { clubService, type Club, type ClubMember, type ClubHabit } from "@/services/clubService"
+import { clubService, type Club, type ClubMember, type ClubHabit, type LeaderboardEntry } from "@/services/clubService"
+import { useToast } from "@/contexts/ToastContext"
+import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
 import {
-    ArrowLeft, Users, BookOpen, Flame, Zap, Target, Plus,
+    ArrowLeft, Users, BookOpen, Flame, Target, Plus,
     Crown, Shield, User, Globe, Lock, CheckCircle2,
-    LogOut, Trash2, Copy, Key, X
+    LogOut, Trash2, Copy, Key, X, Trophy
 } from "lucide-react"
 
 const categoryColors: Record<string, string> = {
@@ -28,6 +30,9 @@ export function ClubDetail() {
     const { clubId } = useParams<{ clubId: string }>()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const toast = useToast()
+    const { loggedIds: loggedClubHabitIds, markLogged: markClubHabitLogged } = useTodayLoggedClubHabits()
+    const [completingClubHabitId, setCompletingClubHabitId] = useState<string | null>(null)
 
     const [activeTab, setActiveTab] = useState<Tab>("overview")
     const [showAddHabit, setShowAddHabit] = useState(false)
@@ -55,6 +60,14 @@ export function ClubDetail() {
         queryKey: ["club-habits", clubId],
         queryFn: () => clubService.getClubHabits(clubId!),
         enabled: !!clubId,
+    })
+
+    // Fetch leaderboard
+    const { data: leaderboard = [] } = useQuery<LeaderboardEntry[]>({
+        queryKey: ["club-leaderboard", clubId],
+        queryFn: () => clubService.getLeaderboard(clubId!),
+        enabled: !!clubId,
+        refetchInterval: 30_000,
     })
 
     // Fetch user's clubs to know membership
@@ -98,10 +111,28 @@ export function ClubDetail() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["club-habits", clubId] }),
     })
 
-    const acceptHabitMutation = useMutation({
-        mutationFn: (habitId: string) => clubService.acceptClubHabit(clubId!, habitId),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["habits"] }),
+    const logHabitMutation = useMutation({
+        mutationFn: ({ habitId, habitName: _n }: { habitId: string; habitName: string }) =>
+            clubService.logClubHabit(clubId!, habitId),
+        onSuccess: (data: any, { habitId, habitName }) => {
+            queryClient.invalidateQueries({ queryKey: ["club-leaderboard", clubId] })
+            markClubHabitLogged(habitId)
+            setCompletingClubHabitId(null)
+            const xp = data?.xpEarned ?? 0
+            toast.xp(xp, `${habitName} logged! 🏆`)
+        },
+        onError: (e: any, { habitId }) => {
+            setCompletingClubHabitId(null)
+            const msg: string = e?.response?.data?.message || e?.message || ""
+            if (msg.toLowerCase().includes("already logged")) {
+                markClubHabitLogged(habitId)
+            } else {
+                toast.error("Failed to log habit", msg)
+            }
+        }
     })
+
+
 
     const handleShowInviteCode = async () => {
         try {
@@ -247,37 +278,41 @@ export function ClubDetail() {
                         {/* Leaderboard */}
                         <div className="surface-card p-5">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>🏆 Leaderboard</h3>
-                                <button onClick={() => setActiveTab("members")} className="text-xs" style={{ color: "var(--green)" }}>See all →</button>
+                                <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: "hsl(150 10% 55%)" }}>
+                                    <Trophy className="h-4 w-4" style={{ color: "#f59e0b" }} />
+                                    Leaderboard
+                                </h3>
+                                <span className="text-xs" style={{ color: "hsl(150 10% 40%)" }}>by club completions</span>
                             </div>
-                            {sortedMembers.length === 0 ? (
-                                <div className="text-xs py-4" style={{ color: "hsl(150 10% 40%)" }}>No members yet</div>
+                            {leaderboard.length === 0 ? (
+                                <div className="text-xs py-4 text-center" style={{ color: "hsl(150 10% 40%)" }}>No completions yet — be the first! 🚀</div>
                             ) : (
                                 <div className="flex flex-col gap-2">
-                                    {sortedMembers.slice(0, 5).map((member, idx) => {
-                                        const RoleIcon = ROLE_ICONS[member.role] || User
-                                        const isPodium = idx < 3
+                                    {leaderboard.slice(0, 5).map((entry) => {
+                                        const isPodium = entry.rank <= 3
                                         const pc = ["#f59e0b", "#94a3b8", "#b45309"]
+                                        const podiumColor = pc[entry.rank - 1]
+                                        const maxCompletions = leaderboard[0]?.completions || 1
+                                        const barWidth = Math.round((entry.completions / maxCompletions) * 100)
                                         return (
-                                            <div key={member._id} className="flex items-center gap-3 p-3 rounded-xl"
-                                                style={{ background: "hsl(150 15% 10%)", border: isPodium ? `1px solid ${pc[idx]}22` : "1px solid transparent" }}>
+                                            <div key={entry.userId} className="flex items-center gap-3 p-3 rounded-xl"
+                                                style={{ background: "hsl(150 15% 10%)", border: isPodium ? `1px solid ${podiumColor}22` : "1px solid transparent" }}>
                                                 <div className="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-extrabold flex-shrink-0"
-                                                    style={{ background: isPodium ? `${pc[idx]}22` : "hsl(150 15% 14%)", color: isPodium ? pc[idx] : "hsl(150 10% 40%)" }}>
-                                                    {isPodium ? ["🥇", "🥈", "🥉"][idx] : idx + 1}
+                                                    style={{ background: isPodium ? `${podiumColor}22` : "hsl(150 15% 14%)", color: isPodium ? podiumColor : "hsl(150 10% 40%)" }}>
+                                                    {isPodium ? ["🥇", "🥈", "🥉"][entry.rank - 1] : entry.rank}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 88%)" }}>{member.username}</span>
-                                                        <RoleIcon className="h-3 w-3 flex-shrink-0"
-                                                            style={{ color: member.role === "OWNER" ? "#f59e0b" : member.role === "ADMIN" ? "#8b5cf6" : "hsl(150 10% 35%)" }} />
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 88%)" }}>{entry.username}</span>
+                                                        <span className="text-xs font-bold ml-2 flex-shrink-0" style={{ color: isPodium ? podiumColor : "hsl(150 10% 55%)" }}>
+                                                            {entry.completions} ✓
+                                                        </span>
                                                     </div>
-                                                    <span className="text-xs capitalize" style={{ color: "hsl(150 10% 40%)" }}>{member.role?.toLowerCase()}</span>
+                                                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(150 15% 14%)" }}>
+                                                        <div className="h-full rounded-full transition-all"
+                                                            style={{ width: `${barWidth}%`, background: isPodium ? podiumColor : "hsl(150 30% 35%)" }} />
+                                                    </div>
                                                 </div>
-                                                {member.currentStreak !== undefined && (
-                                                    <div className="flex items-center gap-1 text-xs" style={{ color: "#f97316" }}>
-                                                        <Flame className="h-3 w-3" /> {member.currentStreak}d
-                                                    </div>
-                                                )}
                                             </div>
                                         )
                                     })}
@@ -465,36 +500,47 @@ export function ClubDetail() {
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                                style={{ background: `${hColor}15`, color: hColor }}>{habit.category}</span>
-                                            <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                                style={{ background: `${freqColor}15`, color: freqColor }}>{habit.frequency}</span>
-                                            {habit.difficulty && (
+                                        <div className="flex items-center justify-between gap-2 mt-1">
+                                            <div className="flex flex-wrap gap-1.5">
                                                 <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                                    style={{ background: "hsl(150 15% 14%)", color: "hsl(150 10% 50%)" }}>
-                                                    {DIFFICULTY_LABELS[habit.difficulty]}
-                                                </span>
-                                            )}
+                                                    style={{ background: `${hColor}15`, color: hColor }}>{habit.category}</span>
+                                                <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                                                    style={{ background: `${freqColor}15`, color: freqColor }}>{habit.frequency}</span>
+                                                {habit.difficulty && (
+                                                    <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                                                        style={{ background: "hsl(150 15% 14%)", color: "hsl(150 10% 50%)" }}>
+                                                        {DIFFICULTY_LABELS[habit.difficulty]}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {isMember && (() => {
+                                                const isLogged = loggedClubHabitIds.has(habit._id)
+                                                const isLogging = completingClubHabitId === habit._id
+                                                const isDone = isLogged || isLogging
+                                                return (
+                                                    <button
+                                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 transition-all ${isDone ? "opacity-70" : ""}`}
+                                                        disabled={isDone}
+                                                        onClick={() => {
+                                                            if (!isDone) {
+                                                                setCompletingClubHabitId(habit._id)
+                                                                logHabitMutation.mutate({ habitId: habit._id, habitName: habit.name })
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            background: isDone ? "rgba(19,236,106,0.08)" : "var(--green-dim)",
+                                                            color: "var(--green)",
+                                                            border: "1px solid rgba(19,236,106,0.25)"
+                                                        }}>
+                                                        {isDone
+                                                            ? <><CheckCircle2 className="h-3.5 w-3.5" /> Logged</>
+                                                            : <><Target className="h-3.5 w-3.5" /> Log Today</>
+                                                        }
+                                                    </button>
+                                                )
+                                            })()}
                                         </div>
-                                        {/* Members: add to personal habits */}
-                                        {isMember && !isOwner && (
-                                            <button onClick={() => acceptHabitMutation.mutate(habit._id)}
-                                                disabled={acceptHabitMutation.isPending}
-                                                className="w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
-                                                style={{ background: "var(--green-dim)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
-                                                <Zap className="h-3.5 w-3.5" /> Add to My Habits
-                                            </button>
-                                        )}
-                                        {/* Owner can also add it to their personal habits */}
-                                        {isOwner && (
-                                            <button onClick={() => acceptHabitMutation.mutate(habit._id)}
-                                                disabled={acceptHabitMutation.isPending}
-                                                className="w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
-                                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 55%)", border: "1px solid hsl(150 15% 18%)" }}>
-                                                <Zap className="h-3.5 w-3.5" /> Add to My Habits
-                                            </button>
-                                        )}
+
                                     </div>
                                 )
                             })}

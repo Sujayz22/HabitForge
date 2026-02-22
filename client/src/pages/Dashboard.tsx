@@ -2,20 +2,25 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/contexts/ToastContext"
+import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
 import { habitService } from "@/services/habitService"
+import { clubService, type Club, type ClubHabit } from "@/services/clubService"
 import { taskService, type Task, TASK_XP } from "@/services/taskService"
 import api from "@/services/api"
-import { Flame, Zap, CheckCircle2, Trophy, Calendar, Target, ShieldCheck, Sliders, ListTodo, ChevronRight } from "lucide-react"
+import { Flame, Zap, CheckCircle2, Trophy, Calendar, Target, ShieldCheck, Sliders, ListTodo, ChevronRight, ExternalLink } from "lucide-react"
 import { XPChart } from "@/components/domain/XPChart"
 import { ConsistencyHeatmap } from "@/components/domain/ConsistencyHeatmap"
 
 const categoryColors: Record<string, string> = {
     HEALTH: "#13ec6a", LEARNING: "#3b82f6", PRODUCTIVITY: "#f59e0b",
     SOCIAL: "#ec4899", MINDFULNESS: "#8b5cf6", OTHER: "#6b7280",
+    FITNESS: "#13ec6a",
 }
 const categoryBg: Record<string, string> = {
     HEALTH: "rgba(19,236,106,0.12)", LEARNING: "rgba(59,130,246,0.12)", PRODUCTIVITY: "rgba(245,158,11,0.12)",
     SOCIAL: "rgba(236,72,153,0.12)", MINDFULNESS: "rgba(139,92,246,0.12)", OTHER: "rgba(107,114,128,0.12)",
+    FITNESS: "rgba(19,236,106,0.12)",
 }
 const MODE_INFO: Record<string, { label: string; color: string; bg: string }> = {
     DISCIPLINE: { label: "Discipline", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
@@ -23,15 +28,109 @@ const MODE_INFO: Record<string, { label: string; color: string; bg: string }> = 
     COMPETITIVE: { label: "Competitive", color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
 }
 
+// ── Club Challenges Section ────────────────────────────────────────────────
+interface ClubChallengesSectionProps {
+    clubs: Club[]
+    completingId: string | null
+    loggedClubHabitIds: Set<string>
+    onLogClubHabit: (clubId: string, habitId: string, habitName: string) => void
+    navigate: ReturnType<typeof useNavigate>
+}
+
+function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: ClubChallengesSectionProps) {
+    return (
+        <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+                <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
+                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                    Club Challenges
+                </h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {clubs.map(club => (
+                    <ClubHabitsInDashboard
+                        key={club._id}
+                        club={club}
+                        completingId={completingId}
+                        loggedClubHabitIds={loggedClubHabitIds}
+                        onLogClubHabit={onLogClubHabit}
+                        navigate={navigate}
+                    />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: {
+    club: Club
+    completingId: string | null
+    loggedClubHabitIds: Set<string>
+    onLogClubHabit: (clubId: string, habitId: string, habitName: string) => void
+    navigate: ReturnType<typeof useNavigate>
+}) {
+    const { data: habits = [], isLoading } = useQuery<ClubHabit[]>({
+        queryKey: ["club-habits", club._id],
+        queryFn: () => clubService.getClubHabits(club._id),
+        staleTime: 60_000,
+    })
+
+    if (isLoading || habits.length === 0) return null
+
+    return (
+        <div className="surface-card p-5">
+            <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>
+                    🏆 {club.name}
+                </h3>
+                <button onClick={() => navigate(`/clubs/${club._id}`)}
+                    className="flex items-center gap-1 text-xs" style={{ color: "var(--green)" }}>
+                    View <ExternalLink className="h-3 w-3" />
+                </button>
+            </div>
+            <div className="flex flex-col gap-2">
+                {habits.map(habit => {
+                    const hColor = categoryColors[habit.category || "OTHER"] || "#6b7280"
+                    const hBg = categoryBg[habit.category || "OTHER"] || "rgba(107,114,128,0.12)"
+                    const isCompleting = completingId === habit._id
+                    const isLogged = loggedClubHabitIds.has(habit._id)
+                    const isDone = isLogged || isCompleting
+                    return (
+                        <div key={habit._id} className="flex items-center gap-3 py-1.5"
+                            style={{ borderBottom: "1px solid hsl(150 15% 11%)" }}>
+                            <button
+                                className={`complete-btn ${isDone ? "completed" : ""}`}
+                                disabled={isDone}
+                                onClick={() => { if (!isDone) onLogClubHabit(club._id, habit._id, habit.name) }}>
+                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                            </button>
+                            <div className="h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{ background: hBg, color: hColor }}>
+                                <Target className="h-3.5 w-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className={`text-sm font-semibold truncate ${isDone ? "line-through opacity-50" : ""}`}
+                                    style={{ color: "hsl(150 10% 88%)" }}>{habit.name}</div>
+                                <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.category} · {habit.frequency}</div>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
+
 export function Dashboard() {
     const { user } = useAuth()
     const qc = useQueryClient()
     const navigate = useNavigate()
+    const toast = useToast()
     const [completingHabitId, setCompletingHabitId] = useState<string | null>(null)
     const [completingTaskId, setCompletingTaskId] = useState<string | null>(null)
-    const [graceToast, setGraceToast] = useState<string | null>(null)
-
-    const showToast = (msg: string) => { setGraceToast(msg); setTimeout(() => setGraceToast(null), 3000) }
+    const [completingClubHabitId, setCompletingClubHabitId] = useState<string | null>(null)
+    const { loggedIds: loggedClubHabitIds, markLogged: markClubHabitLogged } = useTodayLoggedClubHabits()
 
     // ── Queries ───────────────────────────────────────────────────────────────
     const { data: habits = [] } = useQuery({ queryKey: ["habits"], queryFn: habitService.getHabits })
@@ -56,16 +155,52 @@ export function Dashboard() {
 
     const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: taskService.getTasks })
 
+    const { data: myClubs = [] } = useQuery<Club[]>({
+        queryKey: ["clubs", "my"],
+        queryFn: clubService.getMyClubs,
+        staleTime: 60_000,
+    })
+
     // ── Habit log mutation ────────────────────────────────────────────────────
     const logHabitMutation = useMutation({
         mutationFn: (id: string) => habitService.logHabit(id),
-        onSuccess: () => {
+        onSuccess: (data: any, id: string) => {
             qc.invalidateQueries({ queryKey: ["habits"] })
             qc.invalidateQueries({ queryKey: ["stats"] })
             qc.invalidateQueries({ queryKey: ["logs"] })
             setCompletingHabitId(null)
+            const habitName = habits.find((h: any) => h._id === id)?.name
+            const xp = data?.xpEarned ?? data?.log?.xpEarned ?? 0
+            toast.xp(xp, habitName ? `${habitName} logged! 🔥` : "Habit logged! Keep the streak going 🔥")
         },
-        onError: () => setCompletingHabitId(null),
+        onError: (e: any) => {
+            setCompletingHabitId(null)
+            toast.error("Failed to log habit", e?.response?.data?.message)
+        },
+    })
+
+    // ── Club habit log mutation ───────────────────────────────────────────────
+    const logClubHabitMutation = useMutation({
+        mutationFn: ({ clubId, habitId, habitName: _habitName }: { clubId: string; habitId: string; habitName: string }) =>
+            clubService.logClubHabit(clubId, habitId),
+        onSuccess: (data: any, { habitId, habitName }) => {
+            qc.invalidateQueries({ queryKey: ["habits"] })
+            qc.invalidateQueries({ queryKey: ["stats"] })
+            qc.invalidateQueries({ queryKey: ["logs"] })
+            setCompletingClubHabitId(null)
+            markClubHabitLogged(habitId)
+            const xp = data?.xpEarned ?? 0
+            toast.xp(xp, `${habitName} logged! 🏆`)
+        },
+        onError: (e: any, { habitId }) => {
+            setCompletingClubHabitId(null)
+            const msg: string = e?.response?.data?.message || e?.message || ""
+            if (msg.toLowerCase().includes("already logged")) {
+                markClubHabitLogged(habitId)
+            } else {
+                toast.error("Failed to log club habit", msg)
+            }
+        },
     })
 
     // ── Task complete mutation ─────────────────────────────────────────────────
@@ -76,9 +211,12 @@ export function Dashboard() {
             qc.invalidateQueries({ queryKey: ["tasks-stats"] })
             qc.invalidateQueries({ queryKey: ["profile"] })
             setCompletingTaskId(null)
-            showToast(`Task done! +${data.xpEarned} XP 🎯`)
+            toast.xp(data.xpEarned, "Task completed! 🎯")
         },
-        onError: () => setCompletingTaskId(null),
+        onError: (e: any) => {
+            setCompletingTaskId(null)
+            toast.error("Failed to complete task", e?.response?.data?.message)
+        },
     })
 
     // ── Grace card mutation ───────────────────────────────────────────────────
@@ -86,9 +224,10 @@ export function Dashboard() {
         mutationFn: (type: "silver" | "gold") => habitService.useGraceCard(type),
         onSuccess: (_, type) => {
             qc.invalidateQueries({ queryKey: ["profile"] })
-            showToast(type === "gold" ? "Gold Card used — full day forgiven! 🌟" : "Silver Card used — habit forgiven! 🛡️")
+            if (type === "gold") toast.success("Gold Card used!", "Full day forgiven 🌟")
+            else toast.success("Silver Card used!", "Habit forgiven 🛡️")
         },
-        onError: (e: any) => showToast(e?.response?.data?.message || "Failed to use grace card"),
+        onError: (e: any) => toast.error("Grace card failed", e?.response?.data?.message),
     })
 
     // ── Derived values ────────────────────────────────────────────────────────
@@ -114,14 +253,6 @@ export function Dashboard() {
 
     return (
         <div className="flex flex-col gap-6">
-            {/* Toast */}
-            {graceToast && (
-                <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold"
-                    style={{ background: "hsl(150 20% 10%)", border: "1px solid rgba(19,236,106,0.3)", color: "#13ec6a", boxShadow: "0 0 20px rgba(19,236,106,0.1)" }}>
-                    {graceToast}
-                </div>
-            )}
-
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
@@ -245,6 +376,20 @@ export function Dashboard() {
                     <XPChart logs={logs} />
                 </div>
             </div>
+
+            {/* Club Challenges */}
+            {myClubs.length > 0 && (
+                <ClubChallengesSection
+                    clubs={myClubs}
+                    completingId={completingClubHabitId}
+                    loggedClubHabitIds={loggedClubHabitIds}
+                    onLogClubHabit={(clubId, habitId, habitName) => {
+                        setCompletingClubHabitId(habitId)
+                        logClubHabitMutation.mutate({ clubId, habitId, habitName })
+                    }}
+                    navigate={navigate}
+                />
+            )}
 
             {/* Tasks + Grace Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

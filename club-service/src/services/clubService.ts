@@ -325,3 +325,124 @@ export async function getUserAcceptedHabits(clubId: string, userId: string) {
         };
     });
 }
+
+/**
+ * Log a club habit completion (auto-accepts if not already done)
+ */
+export async function logClubHabit(clubId: string, clubHabitId: string, userId: string, username: string, token: string) {
+    // Verify the user is a club member
+    const membership = await Membership.findOne({ clubId, userId });
+    if (!membership) {
+        throw new Error('Not a member of this club');
+    }
+
+    const clubHabit = await ClubHabit.findById(clubHabitId);
+    if (!clubHabit || clubHabit.clubId !== clubId) {
+        throw new Error('Club habit not found');
+    }
+
+    // Find or auto-create the personal habit for this user
+    let accepted = await AcceptedHabit.findOne({ clubHabitId, userId });
+    let userHabitId: string;
+
+    if (!accepted) {
+        // Auto-accept: create a personal habit copy in the habit-service
+        // Valid habit-service categories: HEALTH, PRODUCTIVITY, LEARNING, SOCIAL, FINANCE, MINDFULNESS, OTHER
+        const VALID_CATEGORIES = ['HEALTH', 'PRODUCTIVITY', 'LEARNING', 'SOCIAL', 'FINANCE', 'MINDFULNESS', 'OTHER'];
+        const CATEGORY_MAP: Record<string, string> = {
+            'FITNESS': 'HEALTH',
+            'EXERCISE': 'HEALTH',
+            'WELLNESS': 'HEALTH',
+            'WORK': 'PRODUCTIVITY',
+            'STUDY': 'LEARNING',
+            'EDUCATION': 'LEARNING',
+            'COMMUNITY': 'SOCIAL',
+            'RELATIONSHIPS': 'SOCIAL',
+            'MONEY': 'FINANCE',
+            'MEDITATION': 'MINDFULNESS',
+            'MENTAL': 'MINDFULNESS',
+        };
+        const rawCategory = (clubHabit.category || '').toUpperCase();
+        const normalizedCategory = VALID_CATEGORIES.includes(rawCategory)
+            ? rawCategory
+            : (CATEGORY_MAP[rawCategory] || 'OTHER');
+
+        try {
+            const response = await axios.post(
+                `${HABIT_SERVICE_URL}/api/habits`,
+                {
+                    name: clubHabit.name,
+                    description: `[Club] ${clubHabit.description || ''}`.trim(),
+                    category: normalizedCategory,
+                    difficulty: (clubHabit.difficulty >= 1 && clubHabit.difficulty <= 5)
+                        ? clubHabit.difficulty
+                        : 2,
+                    frequency: ['DAILY', 'WEEKLY', 'CUSTOM'].includes(clubHabit.frequency)
+                        ? clubHabit.frequency
+                        : 'DAILY'
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            userHabitId = response.data.data._id;
+
+            accepted = await AcceptedHabit.create({
+                clubId,
+                clubHabitId,
+                userId,
+                userHabitId
+            });
+
+            // Log ACCEPTED_TASK activity
+            await ActivityLog.create({
+                clubId,
+                userId,
+                username,
+                habitName: clubHabit.name,
+                action: 'ACCEPTED_TASK',
+                timestamp: new Date()
+            });
+        } catch (error: any) {
+            throw new Error(`Failed to auto-create habit: ${error.message}`);
+        }
+    } else {
+        userHabitId = accepted.userHabitId;
+    }
+
+    // Log the completion via habit-service
+    try {
+        const logResponse = await axios.post(
+            `${HABIT_SERVICE_URL}/api/habits/${userHabitId}/log`,
+            {},
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        // Log HABIT_COMPLETED activity
+        await ActivityLog.create({
+            clubId,
+            userId,
+            username,
+            habitName: clubHabit.name,
+            action: 'COMPLETED_HABIT',
+            timestamp: new Date()
+        });
+
+        return {
+            clubHabitId,
+            userHabitId,
+            xpEarned: logResponse.data.data?.xpEarned || logResponse.data.xpEarned || 0
+        };
+    } catch (error: any) {
+        const msg = error?.response?.data?.message || error.message;
+        throw new Error(msg || 'Failed to log habit completion');
+    }
+}

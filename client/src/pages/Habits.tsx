@@ -4,6 +4,8 @@ import { habitService, type Habit } from "@/services/habitService"
 import { clubService, type Club, type ClubHabit } from "@/services/clubService"
 import { useNavigate } from "react-router-dom"
 import { Plus, Flame, Zap, Pencil, Trash2, CheckCircle2, Lock, Shield, Swords, Target, ExternalLink } from "lucide-react"
+import { useToast } from "@/contexts/ToastContext"
+import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
 
 const CATEGORIES = ["HEALTH", "LEARNING", "PRODUCTIVITY", "SOCIAL", "MINDFULNESS", "OTHER"]
 const FREQUENCIES = ["DAILY", "WEEKLY", "CUSTOM"]
@@ -42,30 +44,20 @@ const emptyForm = {
 // ── Club Challenges Section Component ─────────────────────────
 interface ClubSectionProps {
     club: Club
-    logs: any[]
-    todayStr: string
-    onLogHabit: (id: string) => void
     completingId: string | null
+    loggedIds: Set<string>
+    onLogClubHabit: (clubId: string, habitId: string, habitName: string) => void
     navigate: ReturnType<typeof useNavigate>
 }
 
-function ClubHabitsCard({ club, logs, todayStr, onLogHabit, completingId, navigate }: ClubSectionProps) {
+function ClubHabitsCard({ club, completingId, loggedIds, onLogClubHabit, navigate }: ClubSectionProps) {
     const { data: habits = [], isLoading } = useQuery<ClubHabit[]>({
         queryKey: ["club-habits", club._id],
         queryFn: () => clubService.getClubHabits(club._id),
         staleTime: 60_000,
     })
 
-    const acceptMutation = useMutation({
-        mutationFn: (habitId: string) => clubService.acceptClubHabit(club._id, habitId),
-        onSuccess: () => { },
-    })
-
     if (isLoading || habits.length === 0) return null
-
-    const todayCompletedIds = new Set(
-        logs.filter((l: any) => l.completedAt?.slice(0, 10) === todayStr).map((l: any) => l.habitId)
-    )
 
     return (
         <div className="surface-card p-5">
@@ -86,25 +78,25 @@ function ClubHabitsCard({ club, logs, todayStr, onLogHabit, completingId, naviga
                 {habits.map((habit) => {
                     const hColor = categoryColors[habit.category || "OTHER"] || "#6b7280"
                     const hBg = categoryBg[habit.category || "OTHER"] || "rgba(107,114,128,0.12)"
-                    const done = todayCompletedIds.has(habit._id)
-                    const isCompleting = completingId === habit._id
+                    const isSubmitting = completingId === habit._id
+                    const isDone = loggedIds.has(habit._id) || isSubmitting
 
                     return (
                         <div key={habit._id} className="flex items-center gap-3 p-3 rounded-xl"
                             style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 12% 14%)" }}>
                             <button
-                                className={`complete-btn ${done ? "completed" : ""}`}
-                                disabled={done || isCompleting}
-                                onClick={() => { if (!done) onLogHabit(habit._id) }}
-                                title={done ? "Completed today" : "Mark as done"}>
-                                {done && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                                className={`complete-btn ${isDone ? "completed" : ""}`}
+                                disabled={isDone}
+                                onClick={() => { if (!isDone) onLogClubHabit(club._id, habit._id, habit.name) }}
+                                title={isDone ? "Logged today" : "Mark as done"}>
+                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
                             </button>
                             <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
                                 style={{ background: hBg, color: hColor }}>
                                 <Target className="h-4 w-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className={`text-sm font-semibold truncate ${done ? "line-through opacity-50" : ""}`}
+                                <div className={`text-sm font-semibold truncate ${isDone ? "line-through opacity-50" : ""}`}
                                     style={{ color: "hsl(150 10% 90%)" }}>{habit.name}</div>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <span className="text-xs px-1.5 py-0.5 rounded font-semibold"
@@ -112,15 +104,6 @@ function ClubHabitsCard({ club, logs, todayStr, onLogHabit, completingId, naviga
                                     <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.frequency}</span>
                                 </div>
                             </div>
-                            {!done && (
-                                <button onClick={() => acceptMutation.mutate(habit._id)}
-                                    disabled={acceptMutation.isPending}
-                                    className="flex-shrink-0 text-xs px-2 py-1 rounded-lg font-semibold disabled:opacity-40"
-                                    style={{ background: "var(--green-dim)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}
-                                    title="Add to My Habits">
-                                    <Plus className="h-3 w-3" />
-                                </button>
-                            )}
                         </div>
                     )
                 })}
@@ -133,10 +116,13 @@ function ClubHabitsCard({ club, logs, todayStr, onLogHabit, completingId, naviga
 export function Habits() {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
+    const toast = useToast()
     const [showCreate, setShowCreate] = useState(false)
     const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
     const [completingId, setCompletingId] = useState<string | null>(null)
+    const [completingClubHabitId, setCompletingClubHabitId] = useState<string | null>(null)
     const [form, setForm] = useState(emptyForm)
+    const { loggedIds: loggedClubHabitIds, markLogged: markClubHabitLogged } = useTodayLoggedClubHabits()
 
     const { data: habits = [], isLoading } = useQuery({
         queryKey: ["habits"],
@@ -145,7 +131,7 @@ export function Habits() {
 
     const { data: logs = [] } = useQuery({
         queryKey: ["logs"],
-        queryFn: habitService.getLogs,
+        queryFn: () => habitService.getHabitLogs(),
         staleTime: 30_000,
     })
 
@@ -166,7 +152,9 @@ export function Habits() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["habits"] })
             closeForm()
+            toast.success("Habit created!", "Start your streak today 🔥")
         },
+        onError: (e: any) => toast.error("Failed to create habit", e?.response?.data?.message),
     })
 
     const updateMutation = useMutation({
@@ -179,18 +167,49 @@ export function Habits() {
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => habitService.deleteHabit(id),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["habits"] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["habits"] })
+            toast.info("Habit deleted")
+        },
     })
 
     const logMutation = useMutation({
         mutationFn: (id: string) => habitService.logHabit(id),
-        onSuccess: () => {
+        onSuccess: (data: any) => {
             queryClient.invalidateQueries({ queryKey: ["habits"] })
             queryClient.invalidateQueries({ queryKey: ["stats"] })
             queryClient.invalidateQueries({ queryKey: ["logs"] })
             setCompletingId(null)
+            const xp = data?.xpEarned ?? data?.log?.xpEarned ?? 0
+            toast.xp(xp, "Habit logged! 🔥")
         },
-        onError: () => setCompletingId(null),
+        onError: (e: any) => {
+            setCompletingId(null)
+            toast.error("Failed to log habit", e?.response?.data?.message)
+        },
+    })
+
+    const logClubHabitMutation = useMutation({
+        mutationFn: ({ clubId, habitId, habitName: _n }: { clubId: string; habitId: string; habitName: string }) =>
+            clubService.logClubHabit(clubId, habitId),
+        onSuccess: (data: any, { habitId, habitName }) => {
+            queryClient.invalidateQueries({ queryKey: ["habits"] })
+            queryClient.invalidateQueries({ queryKey: ["stats"] })
+            queryClient.invalidateQueries({ queryKey: ["logs"] })
+            setCompletingClubHabitId(null)
+            markClubHabitLogged(habitId)
+            const xp = data?.xpEarned ?? 0
+            toast.xp(xp, `${habitName} logged! 🏆`)
+        },
+        onError: (e: any, { habitId }) => {
+            setCompletingClubHabitId(null)
+            const msg: string = e?.response?.data?.message || e?.message || ""
+            if (msg.toLowerCase().includes("already logged")) {
+                markClubHabitLogged(habitId)
+            } else {
+                toast.error("Failed to log club habit", msg)
+            }
+        },
     })
 
     const todayStr = new Date().toISOString().slice(0, 10)
@@ -469,10 +488,12 @@ export function Habits() {
                                 <ClubHabitsCard
                                     key={club._id}
                                     club={club}
-                                    logs={logs as any[]}
-                                    todayStr={todayStr}
-                                    onLogHabit={(id) => { setCompletingId(id); logMutation.mutate(id) }}
-                                    completingId={completingId}
+                                    completingId={completingClubHabitId}
+                                    loggedIds={loggedClubHabitIds}
+                                    onLogClubHabit={(clubId, habitId, habitName) => {
+                                        setCompletingClubHabitId(habitId)
+                                        logClubHabitMutation.mutate({ clubId, habitId, habitName })
+                                    }}
                                     navigate={navigate}
                                 />
                             ))}

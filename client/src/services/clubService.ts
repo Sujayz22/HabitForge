@@ -38,6 +38,13 @@ export interface ClubHabit {
     createdAt?: string
 }
 
+export interface LeaderboardEntry {
+    rank: number
+    userId: string
+    username: string
+    completions: number
+}
+
 const clubService = {
     getPublicClubs: async (): Promise<Club[]> => {
         try {
@@ -93,6 +100,11 @@ const clubService = {
         await api.post(`/clubs/${clubId}/habits/${habitId}/accept`)
     },
 
+    logClubHabit: async (clubId: string, habitId: string): Promise<{ userHabitId: string; xpEarned: number }> => {
+        const response = await api.post(`/clubs/${clubId}/habits/${habitId}/log`)
+        return response.data.data || response.data
+    },
+
     addClubHabit: async (clubId: string, data: Partial<ClubHabit>): Promise<ClubHabit> => {
         const response = await api.post(`/clubs/${clubId}/habits`, data)
         return response.data.data || response.data
@@ -119,6 +131,15 @@ const clubService = {
     joinByInviteCode: async (inviteCode: string): Promise<Club> => {
         const response = await api.post("/clubs/join-by-code", { inviteCode })
         return response.data.data || response.data
+    },
+
+    getLeaderboard: async (clubId: string): Promise<LeaderboardEntry[]> => {
+        try {
+            const response = await api.get(`/clubs/${clubId}/leaderboard`)
+            return response.data.data || []
+        } catch {
+            return []
+        }
     },
 
     leaveClub: async (clubId: string): Promise<void> => {

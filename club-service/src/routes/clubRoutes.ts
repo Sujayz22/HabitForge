@@ -27,7 +27,11 @@ router.post('/clubs/:clubId/habits', clubController.addClubHabit);
 router.get('/clubs/:clubId/habits', clubController.getClubHabits);
 router.delete('/clubs/:clubId/habits/:habitId', clubController.deleteClubHabit);
 router.post('/clubs/:clubId/habits/:habitId/accept', clubController.acceptClubHabit);
+router.post('/clubs/:clubId/habits/:habitId/log', clubController.logClubHabit);
 router.get('/clubs/:clubId/accepted-habits', clubController.getUserAcceptedHabits);
+
+// Leaderboard
+router.get('/clubs/:clubId/leaderboard', clubController.getLeaderboard);
 
 // Invite code
 router.get('/clubs/:clubId/invite-code', clubController.getClubInviteCode);

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthProvider } from "@/contexts/AuthContext"
+import { ToastProvider } from "@/contexts/ToastContext"
 import { MainLayout } from "@/components/layouts/MainLayout"
 import { Dashboard } from "@/pages/Dashboard"
 import { Login } from "@/pages/Login"
@@ -27,28 +28,30 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            <Route element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/habits" element={<Habits />} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/clubs" element={<Clubs />} />
-              <Route path="/clubs/:clubId" element={<ClubDetail />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/mode" element={<ModeConfig />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              <Route element={
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/habits" element={<Habits />} />
+                <Route path="/tasks" element={<Tasks />} />
+                <Route path="/clubs" element={<Clubs />} />
+                <Route path="/clubs/:clubId" element={<ClubDetail />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/mode" element={<ModeConfig />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   )

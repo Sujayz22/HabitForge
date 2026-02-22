@@ -2,7 +2,87 @@ import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import api from "@/services/api"
-import { Zap } from "lucide-react"
+import { Zap, AlertTriangle, X } from "lucide-react"
+
+function ErrorDialog({ message, onClose }: { message: string; onClose: () => void }) {
+    return (
+        <div
+            onClick={onClose}
+            style={{
+                position: "fixed", inset: 0, zIndex: 9999, display: "flex",
+                alignItems: "center", justifyContent: "center",
+                background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)",
+                animation: "toastIn 0.2s ease",
+            }}
+        >
+            <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                    background: "hsl(150 20% 7%)",
+                    border: "1px solid rgba(239,68,68,0.35)",
+                    borderRadius: "16px",
+                    padding: "28px 28px 24px",
+                    width: "100%",
+                    maxWidth: "340px",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(239,68,68,0.2)",
+                    animation: "toastIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                    position: "relative",
+                }}
+            >
+                {/* Close button */}
+                <button
+                    onClick={onClose}
+                    style={{
+                        position: "absolute", top: 12, right: 12,
+                        background: "transparent", border: "none", cursor: "pointer",
+                        color: "hsl(150 10% 40%)", padding: "4px", borderRadius: "6px",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "color 0.15s",
+                    }}
+                    onMouseOver={e => (e.currentTarget.style.color = "hsl(150 10% 70%)")}
+                    onMouseOut={e => (e.currentTarget.style.color = "hsl(150 10% 40%)")}
+                >
+                    <X size={16} />
+                </button>
+
+                {/* Icon */}
+                <div style={{
+                    width: 48, height: 48, borderRadius: "12px",
+                    background: "rgba(239,68,68,0.12)",
+                    border: "1px solid rgba(239,68,68,0.25)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    marginBottom: "16px",
+                }}>
+                    <AlertTriangle style={{ color: "#ef4444", width: 24, height: 24 }} />
+                </div>
+
+                {/* Content */}
+                <h3 style={{ color: "hsl(150 10% 92%)", fontWeight: 700, fontSize: "16px", marginBottom: "6px" }}>
+                    Login Failed
+                </h3>
+                <p style={{ color: "hsl(150 10% 55%)", fontSize: "13px", lineHeight: 1.5, marginBottom: "20px" }}>
+                    {message}
+                </p>
+
+                {/* Dismiss */}
+                <button
+                    onClick={onClose}
+                    style={{
+                        width: "100%", padding: "10px", borderRadius: "10px",
+                        background: "rgba(239,68,68,0.12)",
+                        border: "1px solid rgba(239,68,68,0.25)",
+                        color: "#ef4444", fontSize: "13px", fontWeight: 700,
+                        cursor: "pointer", transition: "background 0.15s",
+                    }}
+                    onMouseOver={e => (e.currentTarget.style.background = "rgba(239,68,68,0.2)")}
+                    onMouseOut={e => (e.currentTarget.style.background = "rgba(239,68,68,0.12)")}
+                >
+                    Try Again
+                </button>
+            </div>
+        </div>
+    )
+}
 
 export function Login() {
     const [email, setEmail] = useState("")
@@ -22,7 +102,7 @@ export function Login() {
             login(accessToken, user)
             navigate("/dashboard")
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to login")
+            setError(err.response?.data?.message || "Incorrect email or password")
         } finally {
             setLoading(false)
         }
@@ -30,6 +110,9 @@ export function Login() {
 
     return (
         <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "hsl(150 30% 4%)" }}>
+            {/* Error dialog */}
+            {error && <ErrorDialog message={error} onClose={() => setError("")} />}
+
             <div className="w-full max-w-sm">
                 {/* Logo */}
                 <div className="flex items-center gap-3 justify-center mb-8">
@@ -42,13 +125,7 @@ export function Login() {
 
                 <div className="surface-card p-6">
                     <h1 className="text-xl font-bold mb-1" style={{ color: "hsl(150 10% 95%)" }}>Welcome back</h1>
-                    <p className="text-sm mb-5" style={{ color: "hsl(150 10% 50%)" }}>Sign in to your command center</p>
-
-                    {error && (
-                        <div className="mb-4 px-3 py-2 rounded-lg text-sm" style={{ background: "rgba(239,68,68,0.1)", color: "hsl(0 60% 60%)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                            {error}
-                        </div>
-                    )}
+                    <p className="text-sm mb-6" style={{ color: "hsl(150 10% 50%)" }}>Sign in to your command center</p>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <div>
@@ -89,3 +166,4 @@ export function Login() {
         </div>
     )
 }
+

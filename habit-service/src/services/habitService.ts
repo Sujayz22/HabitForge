@@ -1,4 +1,5 @@
 import { Habit, IHabit, HabitCategory, HabitFrequency, TaskDifficulty } from '../models/Habit';
+import { UserStats } from '../models/UserStats';
 
 export interface CreateHabitData {
     userId: string;
@@ -46,18 +47,35 @@ export async function createHabit(data: CreateHabitData): Promise<IHabit> {
 }
 
 /**
- * Get all habits for a user
+ * Get all habits for a user, enriched with streak data from UserStats
  */
 export async function getUserHabits(
     userId: string,
     activeOnly: boolean = true
-): Promise<IHabit[]> {
+): Promise<any[]> {
     const query: any = { userId };
     if (activeOnly) {
         query.isActive = true;
     }
 
-    return Habit.find(query).sort({ createdAt: -1 });
+    const habits = await Habit.find(query).sort({ createdAt: -1 });
+    if (habits.length === 0) return [];
+
+    // Fetch all stats for this user in one query
+    const habitIds = habits.map(h => h._id.toString());
+    const statsArr = await UserStats.find({ userId, habitId: { $in: habitIds } });
+    const statsMap = new Map(statsArr.map(s => [s.habitId, s]));
+
+    // Enrich each habit with streak data
+    return habits.map(h => {
+        const stats = statsMap.get(h._id.toString());
+        const obj = h.toObject() as any;
+        obj.currentStreak = stats?.currentStreak ?? 0;
+        obj.longestStreak = stats?.longestStreak ?? 0;
+        obj.totalCompletions = stats?.totalCompletions ?? 0;
+        obj.momentum = stats?.momentum ?? 0;
+        return obj;
+    });
 }
 
 /**

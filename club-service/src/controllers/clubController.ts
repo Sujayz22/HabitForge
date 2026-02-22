@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import * as clubService from '../services/clubService';
 import * as activityService from '../services/activityService';
+import { ActivityLog } from '../models/ActivityLog';
 import axios from 'axios';
 
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3001';
@@ -326,6 +327,31 @@ export async function acceptClubHabit(req: AuthRequest, res: Response, next: Nex
 }
 
 /**
+ * Log a club habit completion (auto-accepts if needed)
+ */
+export async function logClubHabit(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+        const { clubId, habitId } = req.params;
+        const userId = req.user!.userId;
+        const token = req.headers.authorization!.substring(7);
+
+        const username = await getUsername(userId, token);
+        const result = await clubService.logClubHabit(clubId, habitId, userId, username, token);
+
+        res.status(200).json({
+            success: true,
+            message: 'Habit logged successfully',
+            data: result
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Failed to log habit'
+        });
+    }
+}
+
+/**
  * Get user's accepted habits
  */
 export async function getUserAcceptedHabits(req: AuthRequest, res: Response, next: NextFunction) {
@@ -344,6 +370,34 @@ export async function getUserAcceptedHabits(req: AuthRequest, res: Response, nex
             success: false,
             message: error.message || 'Failed to get accepted habits'
         });
+    }
+}
+
+/**
+ * Get club leaderboard — members ranked by total club habit completions
+ */
+export async function getLeaderboard(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+        const { clubId } = req.params;
+
+        // Count COMPLETED_HABIT entries per userId for this club
+        const completions = await ActivityLog.aggregate([
+            { $match: { clubId, action: 'COMPLETED_HABIT' } },
+            { $group: { _id: '$userId', username: { $last: '$username' }, completions: { $sum: 1 } } },
+            { $sort: { completions: -1 } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: completions.map((entry: any, i: number) => ({
+                rank: i + 1,
+                userId: entry._id,
+                username: entry.username,
+                completions: entry.completions
+            }))
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || 'Failed to get leaderboard' });
     }
 }
 
