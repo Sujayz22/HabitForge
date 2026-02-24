@@ -66,7 +66,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3001
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -96,7 +96,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3002
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -124,7 +124,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3003
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -153,7 +153,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3004
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -183,7 +183,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3005
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       USER_SERVICE_URL: http://user-service:3001
     depends_on:

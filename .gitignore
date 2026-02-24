@@ -19,4 +19,4 @@ coverage/
 *.pid.lock
 *.md
 *.sh
-*.yml\ndocker-compose.yml\ndocker-compose.local.yml
+docker-compose.local.yml
