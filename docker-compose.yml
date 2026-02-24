@@ -61,12 +61,14 @@ services:
       HABIT_SERVICE_URL: http://habit-service:3002
       CLUB_SERVICE_URL: http://club-service:3003
       ANALYTICS_SERVICE_URL: http://analytics-service:3004
+      TASK_SERVICE_URL: http://task-service:3005
     depends_on:
       - redis
       - user-service
       - habit-service
       - club-service
       - analytics-service
+      - task-service
     networks:
       - habitforge-network
     volumes:
@@ -86,7 +88,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3001
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -116,7 +118,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3002
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -144,7 +146,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3003
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -173,7 +175,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3004
-      MONGODB_URI: mongodb://myAdmin:Phoenix43@129.154.38.176:27017/habitforge?authSource=admin
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: habitforge123
@@ -182,12 +184,39 @@ services:
       CLUB_SERVICE_URL: http://club-service:3003
     depends_on:
       - redis
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - habitforge-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./analytics-service:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Task Service
+  task-service:
+    build:
+      context: ./task-service
+      dockerfile: Dockerfile
+    container_name: habitforge-task-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      MONGODB_URI: mongodb://placeholder_user:placeholder_pass@placeholder_host:27017/habitforge?authSource=admin
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      USER_SERVICE_URL: http://user-service:3001
+    depends_on:
+      - redis
+      - user-service
+    networks:
+      - habitforge-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./task-service:/app
       - /app/node_modules
     command: npm run dev
 
@@ -196,6 +225,4 @@ networks:
     driver: bridge
 
 volumes:
-  mongodb_data:
-  mongodb_config:
   redis_data:
