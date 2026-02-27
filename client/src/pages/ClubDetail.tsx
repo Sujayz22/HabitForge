@@ -7,7 +7,7 @@ import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
 import {
     ArrowLeft, Users, BookOpen, Flame, Target, Plus,
     Crown, Shield, User, Globe, Lock, CheckCircle2,
-    LogOut, Trash2, Copy, Key, X, Trophy, AlertTriangle
+    LogOut, Trash2, Copy, Key, X, Trophy, AlertTriangle, Pencil
 } from "lucide-react"
 
 const categoryColors: Record<string, string> = {
@@ -47,6 +47,12 @@ export function ClubDetail() {
     const [showDeleteClub, setShowDeleteClub] = useState(false)
     const [deleteClubInput, setDeleteClubInput] = useState("")
     const [deleteClubError, setDeleteClubError] = useState("")
+
+    // Edit club state
+    const [showEditClub, setShowEditClub] = useState(false)
+    const [editName, setEditName] = useState("")
+    const [editDesc, setEditDesc] = useState("")
+    const [editIsPublic, setEditIsPublic] = useState(true)
 
     // Fetch club details
     const { data: club, isLoading } = useQuery<Club>({
@@ -105,6 +111,18 @@ export function ClubDetail() {
         onError: (e: any) => {
             setDeleteClubError(e?.response?.data?.message || e?.message || "Failed to delete club")
         }
+    })
+
+    const updateClubMutation = useMutation({
+        mutationFn: (data: { name?: string; description?: string; isPublic?: boolean }) =>
+            clubService.updateClub(clubId!, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["club", clubId] })
+            queryClient.invalidateQueries({ queryKey: ["clubs"] })
+            setShowEditClub(false)
+            toast.success("Club updated! ✏️")
+        },
+        onError: (e: any) => toast.error("Failed to update club", e?.response?.data?.message || e?.message),
     })
 
     const joinMutation = useMutation({
@@ -254,6 +272,12 @@ export function ClubDetail() {
                                     style={{ background: "hsl(150 15% 12%)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
                                     <Crown className="h-3.5 w-3.5 inline mr-1" /> Your Club
                                 </div>
+                                <button
+                                    onClick={() => { setEditName(club.name); setEditDesc(club.description || ""); setEditIsPublic(club.isPublic !== false); setShowEditClub(true) }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                                    style={{ background: "rgba(59,130,246,0.1)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" }}>
+                                    <Pencil className="h-3.5 w-3.5" /> Edit Club
+                                </button>
                                 <button
                                     onClick={() => { setShowDeleteClub(true); setDeleteClubInput(""); setDeleteClubError("") }}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
@@ -729,6 +753,97 @@ export function ClubDetail() {
                             style={{ background: "var(--green)", color: "#0a0f0a" }}>
                             Got it!
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Edit Club Modal ── */}
+            {showEditClub && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+                    <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-4" style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 16%)" }}>
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-base flex items-center gap-2" style={{ color: "hsl(150 10% 92%)" }}>
+                                <Pencil className="h-4 w-4" style={{ color: "#60a5fa" }} /> Edit Club
+                            </h3>
+                            <button onClick={() => setShowEditClub(false)} className="p-1.5 rounded-lg" style={{ color: "hsl(150 10% 50%)" }}>
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        {/* Name */}
+                        <div>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Club Name *</label>
+                            <input
+                                value={editName}
+                                onChange={e => setEditName(e.target.value)}
+                                maxLength={50}
+                                placeholder="Club name (3–50 chars)"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                            <textarea
+                                value={editDesc}
+                                onChange={e => setEditDesc(e.target.value)}
+                                rows={3}
+                                maxLength={500}
+                                placeholder="What is this club about?"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                            />
+                            <div className="text-right text-[10px] mt-0.5 font-mono" style={{ color: "hsl(150 10% 35%)" }}>{editDesc.length}/500</div>
+                        </div>
+
+                        {/* Privacy toggle */}
+                        <div>
+                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Privacy</label>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditIsPublic(true)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
+                                    style={{
+                                        background: editIsPublic ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
+                                        color: editIsPublic ? "var(--green)" : "hsl(150 10% 45%)",
+                                        border: `1px solid ${editIsPublic ? "rgba(19,236,106,0.3)" : "hsl(150 15% 18%)"}`,
+                                    }}>
+                                    <Globe className="h-3.5 w-3.5" /> Public
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setEditIsPublic(false)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
+                                    style={{
+                                        background: !editIsPublic ? "rgba(245,158,11,0.12)" : "hsl(150 15% 12%)",
+                                        color: !editIsPublic ? "#f59e0b" : "hsl(150 10% 45%)",
+                                        border: `1px solid ${!editIsPublic ? "rgba(245,158,11,0.3)" : "hsl(150 15% 18%)"}`,
+                                    }}>
+                                    <Lock className="h-3.5 w-3.5" /> Private
+                                </button>
+                            </div>
+                            {!editIsPublic && (
+                                <p className="text-[10px] mt-1.5" style={{ color: "hsl(150 10% 40%)" }}>Private clubs require an invite code to join</p>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 mt-1">
+                            <button
+                                onClick={() => updateClubMutation.mutate({ name: editName.trim(), description: editDesc.trim(), isPublic: editIsPublic })}
+                                disabled={editName.trim().length < 3 || updateClubMutation.isPending}
+                                className="flex-1 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 transition-all"
+                                style={{ background: "#13ec6a", color: "#0a0f0a" }}>
+                                {updateClubMutation.isPending ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button onClick={() => setShowEditClub(false)}
+                                className="px-4 py-2.5 rounded-xl text-sm font-semibold"
+                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 60%)" }}>
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

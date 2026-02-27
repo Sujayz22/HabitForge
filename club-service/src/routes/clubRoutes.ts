@@ -20,6 +20,7 @@ router.post('/clubs/join-by-code', clubController.joinByCode);
 router.post('/clubs', clubController.createClub);
 router.get('/clubs', clubController.getUserClubs);
 router.get('/clubs/:clubId', clubController.getClubDetails);
+router.put('/clubs/:clubId', clubController.updateClub);
 router.post('/clubs/:clubId/join', clubController.joinClub);
 router.delete('/clubs/:clubId', clubController.deleteClubById);
 

@@ -93,10 +93,10 @@ function CharCounter({ current, max }: { current: number; max: number }) {
 /** Cancel an existing task reminder in the Service Worker */
 async function cancelTaskReminder(taskId: string) {
     if (!("serviceWorker" in navigator)) return
-    const reg = await navigator.serviceWorker.getRegistration()
-    const sw = reg?.active
-    if (!sw) return
-    sw.postMessage({ type: "CANCEL_TASK_REMINDER", taskId })
+    try {
+        const reg = await navigator.serviceWorker.ready
+        reg.active?.postMessage({ type: "CANCEL_TASK_REMINDER", taskId })
+    } catch { /* best-effort */ }
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -114,6 +114,7 @@ export function Tasks() {
     const [priority, setPriority] = useState<TaskPriority | "">("")
     const [deadline, setDeadline] = useState("")
     const [reminder, setReminder] = useState(false)
+    const [reminderAt, setReminderAt] = useState("")    // datetime-local string
 
     // Edit state
     const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
@@ -122,13 +123,15 @@ export function Tasks() {
     const [editPriority, setEditPriority] = useState<TaskPriority | "">("")
     const [editDeadline, setEditDeadline] = useState("")
     const [editReminder, setEditReminder] = useState(false)
+    const [editReminderAt, setEditReminderAt] = useState("")  // datetime-local string
+    const [editDiff, setEditDiff] = useState<TaskDifficulty>("MEDIUM")
 
     // Sort state
     const [sortBy, setSortBy] = useState<SortKey>("default")
 
     const resetForm = () => {
         setTitle(""); setDesc(""); setDiff("MEDIUM")
-        setPriority(""); setDeadline(""); setReminder(false)
+        setPriority(""); setDeadline(""); setReminder(false); setReminderAt("")
         setShowForm(false)
     }
 
@@ -136,9 +139,11 @@ export function Tasks() {
         setEditingTaskId(task._id)
         setEditTitle(task.title)
         setEditDesc(task.description ?? "")
+        setEditDiff(task.difficulty)
         setEditPriority(task.priority ?? "")
         setEditDeadline(task.deadline ? toLocalDTString(new Date(task.deadline)) : "")
         setEditReminder(task.reminder ?? false)
+        setEditReminderAt(task.reminderAt ? toLocalDTString(new Date(task.reminderAt)) : "")
     }
 
     const closeEdit = () => setEditingTaskId(null)
@@ -164,15 +169,17 @@ export function Tasks() {
                 priority: priority || undefined,
                 deadline: deadline ? new Date(deadline).toISOString() : undefined,
                 reminder,
+                reminderAt: reminder && reminderAt ? new Date(reminderAt).toISOString() : undefined,
             }
             return taskService.createTask(params)
         },
         onSuccess: (task) => {
             qc.invalidateQueries({ queryKey: ["tasks"] })
             qc.invalidateQueries({ queryKey: ["tasks-stats"] })
-            // Schedule SW reminder if user asked for one and deadline is set
-            if (task.reminder && task.deadline) {
-                scheduleTaskReminder(task._id, task.title, new Date(task.deadline))
+            // Schedule SW reminder at the chosen reminderAt time (falls back to deadline)
+            if (task.reminder) {
+                const fireAt = task.reminderAt ? new Date(task.reminderAt) : task.deadline ? new Date(task.deadline) : null
+                if (fireAt) scheduleTaskReminder(task._id, task.title, fireAt)
             }
             resetForm()
             toast.success("Task forged! 🔥")
@@ -188,9 +195,10 @@ export function Tasks() {
         },
         onSuccess: (task) => {
             qc.invalidateQueries({ queryKey: ["tasks"] })
-            // Reschedule reminder with new deadline if applicable
-            if (task.reminder && task.deadline) {
-                scheduleTaskReminder(task._id, task.title, new Date(task.deadline))
+            // Reschedule reminder at the chosen reminderAt time (falls back to deadline)
+            if (task.reminder) {
+                const fireAt = task.reminderAt ? new Date(task.reminderAt) : task.deadline ? new Date(task.deadline) : null
+                if (fireAt) scheduleTaskReminder(task._id, task.title, fireAt)
             }
             closeEdit()
             toast.success("Task updated ✏️")
@@ -275,18 +283,25 @@ export function Tasks() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    {/* Sort control */}
-                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl"
-                        style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)" }}>
-                        <ArrowUpDown className="h-3.5 w-3.5" style={{ color: "hsl(150 10% 45%)" }} />
-                        <select value={sortBy} onChange={e => setSortBy(e.target.value as SortKey)}
-                            className="text-xs font-semibold bg-transparent outline-none cursor-pointer"
-                            style={{ color: "hsl(150 10% 70%)" }}>
-                            <option value="default">Default</option>
-                            <option value="deadline">By Deadline</option>
-                            <option value="difficulty">By Difficulty</option>
-                            <option value="priority">By Priority</option>
-                        </select>
+                    {/* Sort control — custom styled buttons */}
+                    <div className="flex items-center gap-1 p-1 rounded-xl"
+                        style={{ background: "hsl(150 15% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
+                        <ArrowUpDown className="h-3.5 w-3.5 ml-1 flex-shrink-0" style={{ color: "hsl(150 10% 40%)" }} />
+                        {([
+                            { key: "default", label: "Default" },
+                            { key: "deadline", label: "Deadline" },
+                            { key: "difficulty", label: "Difficulty" },
+                            { key: "priority", label: "Priority" },
+                        ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
+                            <button key={key} onClick={() => setSortBy(key)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all"
+                                style={{
+                                    background: sortBy === key ? "var(--green-dim)" : "transparent",
+                                    color: sortBy === key ? "var(--green)" : "hsl(150 10% 45%)",
+                                }}>
+                                {label}
+                            </button>
+                        ))}
                     </div>
                     <button onClick={() => setShowForm(v => !v)}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105"
@@ -387,38 +402,58 @@ export function Tasks() {
                     </div>
 
                     {/* Deadline + Reminder */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                Deadline <span style={{ color: "hsl(150 10% 35%)" }}>(optional)</span>
-                            </label>
-                            <input
-                                type="datetime-local"
-                                value={deadline}
-                                min={todayMin}
-                                onChange={e => { setDeadline(e.target.value); if (!e.target.value) setReminder(false) }}
-                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 80%)" }}
-                            />
+                    <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                    Deadline <span style={{ color: "hsl(150 10% 35%)" }}>(optional)</span>
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    value={deadline}
+                                    min={todayMin}
+                                    onChange={e => { setDeadline(e.target.value); if (!e.target.value) { setReminder(false); setReminderAt("") } }}
+                                    className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 80%)" }}
+                                />
+                            </div>
+                            <div className="flex flex-col justify-end">
+                                <button
+                                    type="button"
+                                    disabled={!deadline}
+                                    onClick={() => { if (deadline) { setReminder(v => !v); setReminderAt("") } }}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
+                                    style={{
+                                        background: reminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 10%)",
+                                        color: reminder ? "var(--green)" : "hsl(150 10% 45%)",
+                                        border: `1px solid ${reminder ? "rgba(19,236,106,0.3)" : "hsl(150 15% 16%)"}`,
+                                    }}>
+                                    <Bell className="h-3.5 w-3.5" />
+                                    {reminder ? "Reminder on" : "Set reminder"}
+                                </button>
+                                {!deadline && (
+                                    <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Set a deadline to enable reminder</p>
+                                )}
+                            </div>
                         </div>
-                        <div className="flex flex-col justify-end">
-                            <button
-                                type="button"
-                                disabled={!deadline}
-                                onClick={() => { if (deadline) setReminder(v => !v) }}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
-                                style={{
-                                    background: reminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 10%)",
-                                    color: reminder ? "var(--green)" : "hsl(150 10% 45%)",
-                                    border: `1px solid ${reminder ? "rgba(19,236,106,0.3)" : "hsl(150 15% 16%)"}`,
-                                }}>
-                                <Bell className="h-3.5 w-3.5" />
-                                {reminder ? "Reminder on" : "Set reminder"}
-                            </button>
-                            {!deadline && (
-                                <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Set a deadline to enable reminder</p>
-                            )}
-                        </div>
+                        {/* Reminder time picker — shown when reminder is on */}
+                        {reminder && (
+                            <div>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                    🔔 Remind me at
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    value={reminderAt}
+                                    min={todayMin}
+                                    max={deadline}
+                                    onChange={e => setReminderAt(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                    style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "hsl(150 10% 85%)" }}
+                                />
+                                <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Pick when you want the notification — before or at the deadline</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* XP preview + actions */}
@@ -566,6 +601,25 @@ export function Tasks() {
                                             />
                                         </div>
 
+                                        {/* Edit Difficulty */}
+                                        <div>
+                                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
+                                            <div className="flex gap-1.5 flex-wrap">
+                                                {DIFFICULTIES.map(d => (
+                                                    <button key={d.key} type="button"
+                                                        onClick={() => setEditDiff(d.key)}
+                                                        className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
+                                                        style={{
+                                                            background: editDiff === d.key ? d.bg : "hsl(150 15% 12%)",
+                                                            color: editDiff === d.key ? d.color : "hsl(150 10% 45%)",
+                                                            border: `1px solid ${editDiff === d.key ? d.color + "44" : "hsl(150 20% 20%)"}`,
+                                                        }}>
+                                                        {d.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         {/* Edit Priority */}
                                         <div>
                                             <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
@@ -588,38 +642,58 @@ export function Tasks() {
                                         </div>
 
                                         {/* Edit Deadline + Reminder */}
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                                    Deadline
-                                                </label>
-                                                <input
-                                                    type="datetime-local"
-                                                    value={editDeadline}
-                                                    min={todayMin}
-                                                    onChange={e => {
-                                                        setEditDeadline(e.target.value)
-                                                        if (!e.target.value) setEditReminder(false)
-                                                    }}
-                                                    className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                                    style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 20% 20%)", color: "hsl(150 10% 80%)" }}
-                                                />
+                                        <div className="flex flex-col gap-3">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                                        Deadline
+                                                    </label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={editDeadline}
+                                                        min={todayMin}
+                                                        onChange={e => {
+                                                            setEditDeadline(e.target.value)
+                                                            if (!e.target.value) { setEditReminder(false); setEditReminderAt("") }
+                                                        }}
+                                                        className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                                        style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 20% 20%)", color: "hsl(150 10% 80%)" }}
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col justify-end">
+                                                    <button
+                                                        type="button"
+                                                        disabled={!editDeadline}
+                                                        onClick={() => { if (editDeadline) { setEditReminder(v => !v); setEditReminderAt("") } }}
+                                                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
+                                                        style={{
+                                                            background: editReminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
+                                                            color: editReminder ? "var(--green)" : "hsl(150 10% 45%)",
+                                                            border: `1px solid ${editReminder ? "rgba(19,236,106,0.3)" : "hsl(150 20% 20%)"}`,
+                                                        }}>
+                                                        <Bell className="h-3.5 w-3.5" />
+                                                        {editReminder ? "Reminder on" : "Set reminder"}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col justify-end">
-                                                <button
-                                                    type="button"
-                                                    disabled={!editDeadline}
-                                                    onClick={() => { if (editDeadline) setEditReminder(v => !v) }}
-                                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
-                                                    style={{
-                                                        background: editReminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
-                                                        color: editReminder ? "var(--green)" : "hsl(150 10% 45%)",
-                                                        border: `1px solid ${editReminder ? "rgba(19,236,106,0.3)" : "hsl(150 20% 20%)"}`,
-                                                    }}>
-                                                    <Bell className="h-3.5 w-3.5" />
-                                                    {editReminder ? "Reminder on" : "Set reminder"}
-                                                </button>
-                                            </div>
+                                            {/* Reminder time picker */}
+                                            {editReminder && (
+                                                <div>
+                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                                        🔔 Remind me at
+                                                    </label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={editReminderAt}
+                                                        min={todayMin}
+                                                        max={editDeadline}
+                                                        onChange={e => setEditReminderAt(e.target.value)}
+                                                        className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                                        style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "hsl(150 10% 85%)" }}
+                                                    />
+                                                    <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Pick when you want the notification</p>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Edit actions */}
@@ -635,9 +709,11 @@ export function Tasks() {
                                                     const params: UpdateTaskParams = {
                                                         title: editTitle.trim(),
                                                         description: editDesc.trim() || undefined,
+                                                        difficulty: editDiff,
                                                         priority: editPriority || undefined,
                                                         deadline: editDeadline ? new Date(editDeadline).toISOString() : "",
                                                         reminder: editReminder,
+                                                        reminderAt: editReminder && editReminderAt ? new Date(editReminderAt).toISOString() : "",
                                                     }
                                                     updateMutation.mutate({ taskId: task._id, oldDeadline: task.deadline, params })
                                                 }}

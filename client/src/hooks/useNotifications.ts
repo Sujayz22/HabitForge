@@ -11,8 +11,12 @@ function todayStr() {
 /** Get the service worker controller (if registered & active) */
 async function getSW(): Promise<ServiceWorker | null> {
     if (!("serviceWorker" in navigator)) return null
-    const reg = await navigator.serviceWorker.getRegistration()
-    return reg?.active ?? null
+    try {
+        const reg = await navigator.serviceWorker.ready
+        return reg.active ?? null
+    } catch {
+        return null
+    }
 }
 
 /**

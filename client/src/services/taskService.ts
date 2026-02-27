@@ -20,6 +20,7 @@ export interface Task {
     priority?: TaskPriority
     deadline?: string
     reminder?: boolean
+    reminderAt?: string   // ISO string — specific time to fire notification
     isCompleted: boolean
     completedAt?: string
     xpEarned?: number
@@ -41,14 +42,17 @@ export interface CreateTaskParams {
     priority?: TaskPriority
     deadline?: string       // ISO date string or empty
     reminder?: boolean
+    reminderAt?: string     // ISO date string — when to fire the notification
 }
 
 export interface UpdateTaskParams {
     title?: string
     description?: string
+    difficulty?: TaskDifficulty
     priority?: TaskPriority | ""
     deadline?: string       // ISO date string or empty string to clear
     reminder?: boolean
+    reminderAt?: string     // ISO date string or empty string to clear
 }
 
 const taskService = {

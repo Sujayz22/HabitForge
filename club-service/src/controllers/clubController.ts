@@ -509,4 +509,40 @@ export async function deleteClubById(req: AuthRequest, res: Response) {
     }
 }
 
+/**
+ * Update club details (owner only) — name, description, isPublic
+ */
+export async function updateClub(req: AuthRequest, res: Response) {
+    try {
+        const { clubId } = req.params;
+        const userId = req.user!.userId;
+        const { name, description, isPublic } = req.body;
+
+        const Club = (await import('../models/Club')).Club;
+        const club = await Club.findById(clubId);
+        if (!club) return res.status(404).json({ success: false, message: 'Club not found' });
+        if (club.ownerId !== userId) return res.status(403).json({ success: false, message: 'Only the club owner can edit this club' });
+
+        if (name !== undefined) {
+            if (!name.trim() || name.trim().length < 3) return res.status(400).json({ success: false, message: 'Club name must be at least 3 characters' });
+            club.name = name.trim();
+        }
+        if (description !== undefined) club.description = description.trim() || club.description;
+        if (isPublic !== undefined) {
+            const wasPrivate = !club.isPublic;
+            club.isPublic = isPublic === true || isPublic === 'true';
+            // Generate invite code when switching to private if not already set
+            if (!club.isPublic && wasPrivate === false && !club.inviteCode) {
+                club.inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+        }
+
+        await club.save();
+        res.status(200).json({ success: true, message: 'Club updated successfully', data: club });
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message || 'Failed to update club' });
+    }
+}
+
+
 

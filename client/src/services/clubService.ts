@@ -146,6 +146,11 @@ const clubService = {
         await api.post(`/clubs/${clubId}/leave`)
     },
 
+    updateClub: async (clubId: string, data: { name?: string; description?: string; isPublic?: boolean }): Promise<Club> => {
+        const response = await api.put(`/clubs/${clubId}`, data)
+        return response.data.data || response.data
+    },
+
     deleteClub: async (clubId: string): Promise<void> => {
         await api.delete(`/clubs/${clubId}`)
     },

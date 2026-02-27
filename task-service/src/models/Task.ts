@@ -29,6 +29,7 @@ export interface ITask extends Document {
     priority?: TaskPriority;
     deadline?: Date;
     reminder?: boolean;
+    reminderAt?: Date;    // specific time to fire the reminder notification
     isCompleted: boolean;
     completedAt?: Date;
     xpEarned?: number;
@@ -54,6 +55,7 @@ const TaskSchema = new Schema<ITask>(
         },
         deadline: { type: Date, required: false },
         reminder: { type: Boolean, default: false },
+        reminderAt: { type: Date, required: false },
         isCompleted: { type: Boolean, default: false },
         completedAt: { type: Date },
         xpEarned: { type: Number },
