@@ -35,7 +35,7 @@ export function MainLayout() {
                         <Zap className="h-4 w-4" fill="currentColor" />
                     </div>
                     <div>
-                        <div className="text-sm font-800 font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>HabitForge</div>
+                        <div style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "10px", color: "hsl(150 10% 95%)", letterSpacing: "0.02em", lineHeight: 1.4 }}>HabitForge</div>
                     </div>
                 </div>
 

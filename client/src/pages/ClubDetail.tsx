@@ -7,7 +7,7 @@ import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
 import {
     ArrowLeft, Users, BookOpen, Flame, Target, Plus,
     Crown, Shield, User, Globe, Lock, CheckCircle2,
-    LogOut, Trash2, Copy, Key, X, Trophy
+    LogOut, Trash2, Copy, Key, X, Trophy, AlertTriangle, Pencil
 } from "lucide-react"
 
 const categoryColors: Record<string, string> = {
@@ -16,15 +16,17 @@ const categoryColors: Record<string, string> = {
     HEALTH: "#13ec6a",
 }
 const CATEGORIES = ["FITNESS", "LEARNING", "PRODUCTIVITY", "MINDFULNESS", "SOCIAL", "OTHER"]
-const FREQUENCIES = ["DAILY", "WEEKLY"]
+const FREQUENCIES = ["DAILY", "WEEKLY", "CUSTOM"]
 const DIFFICULTIES = [{ label: "Easy", value: 1 }, { label: "Medium", value: 2 }, { label: "Hard", value: 3 }, { label: "Extreme", value: 4 }]
 const ROLE_ICONS: Record<string, any> = { OWNER: Crown, ADMIN: Shield, MEMBER: User }
 const DIFFICULTY_LABELS: Record<number, string> = { 1: "Easy", 2: "Medium", 3: "Hard", 4: "Extreme", 5: "Legendary" }
-const FREQ_COLORS: Record<string, string> = { DAILY: "#13ec6a", WEEKLY: "#3b82f6" }
+const FREQ_COLORS: Record<string, string> = { DAILY: "#13ec6a", WEEKLY: "#3b82f6", CUSTOM: "#8b5cf6" }
+const DAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+const DAY_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 type Tab = "overview" | "members" | "habits"
 
-const emptyHabitForm = { name: "", description: "", category: "FITNESS", frequency: "DAILY", difficulty: 1 }
+const emptyHabitForm = { name: "", description: "", category: "FITNESS", frequency: "DAILY", difficulty: 1, customDays: [] as number[] }
 
 export function ClubDetail() {
     const { clubId } = useParams<{ clubId: string }>()
@@ -40,6 +42,17 @@ export function ClubDetail() {
     const [showInviteCode, setShowInviteCode] = useState(false)
     const [inviteCodeValue, setInviteCodeValue] = useState("")
     const [codeCopied, setCodeCopied] = useState(false)
+
+    // Delete club state
+    const [showDeleteClub, setShowDeleteClub] = useState(false)
+    const [deleteClubInput, setDeleteClubInput] = useState("")
+    const [deleteClubError, setDeleteClubError] = useState("")
+
+    // Edit club state
+    const [showEditClub, setShowEditClub] = useState(false)
+    const [editName, setEditName] = useState("")
+    const [editDesc, setEditDesc] = useState("")
+    const [editIsPublic, setEditIsPublic] = useState(true)
 
     // Fetch club details
     const { data: club, isLoading } = useQuery<Club>({
@@ -89,6 +102,29 @@ export function ClubDetail() {
         },
     })
 
+    const deleteClubMutation = useMutation({
+        mutationFn: () => clubService.deleteClub(clubId!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["clubs"] })
+            navigate("/clubs")
+        },
+        onError: (e: any) => {
+            setDeleteClubError(e?.response?.data?.message || e?.message || "Failed to delete club")
+        }
+    })
+
+    const updateClubMutation = useMutation({
+        mutationFn: (data: { name?: string; description?: string; isPublic?: boolean }) =>
+            clubService.updateClub(clubId!, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["club", clubId] })
+            queryClient.invalidateQueries({ queryKey: ["clubs"] })
+            setShowEditClub(false)
+            toast.success("Club updated! ✏️")
+        },
+        onError: (e: any) => toast.error("Failed to update club", e?.response?.data?.message || e?.message),
+    })
+
     const joinMutation = useMutation({
         mutationFn: () => clubService.joinClub(clubId!),
         onSuccess: () => {
@@ -98,7 +134,14 @@ export function ClubDetail() {
     })
 
     const addHabitMutation = useMutation({
-        mutationFn: (data: Partial<ClubHabit>) => clubService.addClubHabit(clubId!, data),
+        mutationFn: (data: Partial<ClubHabit> & { customDays?: number[] }) => {
+            const payload: any = { ...data }
+            if (data.frequency === 'CUSTOM' && data.customDays?.length) {
+                payload.targetDays = data.customDays
+            }
+            delete payload.customDays
+            return clubService.addClubHabit(clubId!, payload)
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["club-habits", clubId] })
             setShowAddHabit(false)
@@ -224,10 +267,24 @@ export function ClubDetail() {
                     {/* ── Right actions ── */}
                     <div className="flex-shrink-0 flex flex-col gap-2 items-end">
                         {isOwner ? (
-                            <div className="px-4 py-2 rounded-lg text-xs font-semibold text-center"
-                                style={{ background: "hsl(150 15% 12%)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
-                                <Crown className="h-3.5 w-3.5 inline mr-1" /> Your Club
-                            </div>
+                            <>
+                                <div className="px-4 py-2 rounded-lg text-xs font-semibold text-center"
+                                    style={{ background: "hsl(150 15% 12%)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
+                                    <Crown className="h-3.5 w-3.5 inline mr-1" /> Your Club
+                                </div>
+                                <button
+                                    onClick={() => { setEditName(club.name); setEditDesc(club.description || ""); setEditIsPublic(club.isPublic !== false); setShowEditClub(true) }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                                    style={{ background: "rgba(59,130,246,0.1)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" }}>
+                                    <Pencil className="h-3.5 w-3.5" /> Edit Club
+                                </button>
+                                <button
+                                    onClick={() => { setShowDeleteClub(true); setDeleteClubInput(""); setDeleteClubError("") }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                                    style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}>
+                                    <Trash2 className="h-3.5 w-3.5" /> Delete Club
+                                </button>
+                            </>
                         ) : isMember ? (
                             <button onClick={() => leaveMutation.mutate()} disabled={leaveMutation.isPending}
                                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all"
@@ -505,7 +562,11 @@ export function ClubDetail() {
                                                 <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                                                     style={{ background: `${hColor}15`, color: hColor }}>{habit.category}</span>
                                                 <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                                    style={{ background: `${freqColor}15`, color: freqColor }}>{habit.frequency}</span>
+                                                    style={{ background: `${freqColor}15`, color: freqColor }}>
+                                                    {habit.frequency === 'CUSTOM' && (habit as any).targetDays?.length
+                                                        ? (habit as any).targetDays.map((d: number) => DAY_FULL[d].slice(0, 2)).join('·')
+                                                        : habit.frequency}
+                                                </span>
                                                 {habit.difficulty && (
                                                     <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                                                         style={{ background: "hsl(150 15% 14%)", color: "hsl(150 10% 50%)" }}>
@@ -586,13 +647,44 @@ export function ClubDetail() {
                                 </div>
                                 <div>
                                     <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Frequency</label>
-                                    <select value={habitForm.frequency} onChange={e => setHabitForm(f => ({ ...f, frequency: e.target.value }))}
+                                    <select value={habitForm.frequency} onChange={e => setHabitForm(f => ({ ...f, frequency: e.target.value, customDays: [] }))}
                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
                                         style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}>
                                         {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                                     </select>
                                 </div>
                             </div>
+                            {/* Day picker for CUSTOM frequency */}
+                            {habitForm.frequency === "CUSTOM" && (
+                                <div>
+                                    <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Select Days *</label>
+                                    <div className="flex gap-1.5 flex-wrap">
+                                        {DAY_LABELS.map((label, idx) => {
+                                            const selected = habitForm.customDays.includes(idx)
+                                            return (
+                                                <button key={idx} type="button"
+                                                    onClick={() => setHabitForm(f => ({
+                                                        ...f,
+                                                        customDays: selected
+                                                            ? f.customDays.filter(d => d !== idx)
+                                                            : [...f.customDays, idx].sort((a, b) => a - b)
+                                                    }))}
+                                                    className="w-9 h-9 rounded-lg text-xs font-bold transition-all"
+                                                    style={{
+                                                        background: selected ? "rgba(139,92,246,0.2)" : "hsl(150 15% 12%)",
+                                                        border: `1px solid ${selected ? "#8b5cf6" : "hsl(150 15% 18%)"}`,
+                                                        color: selected ? "#8b5cf6" : "hsl(150 10% 50%)"
+                                                    }}>
+                                                    {label}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                    {habitForm.customDays.length === 0 && (
+                                        <p className="text-xs mt-1" style={{ color: "#ef4444" }}>Select at least one day</p>
+                                    )}
+                                </div>
+                            )}
                             <div>
                                 <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
                                 <div className="flex gap-2">
@@ -614,7 +706,11 @@ export function ClubDetail() {
 
                         <div className="flex gap-2 mt-1">
                             <button onClick={() => addHabitMutation.mutate(habitForm)}
-                                disabled={!habitForm.name.trim() || addHabitMutation.isPending}
+                                disabled={
+                                    !habitForm.name.trim() ||
+                                    (habitForm.frequency === 'CUSTOM' && habitForm.customDays.length === 0) ||
+                                    addHabitMutation.isPending
+                                }
                                 className="flex-1 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 transition-all"
                                 style={{ background: "var(--green)", color: "#0a0f0a" }}>
                                 {addHabitMutation.isPending ? "Adding..." : "Add Habit"}
@@ -657,6 +753,157 @@ export function ClubDetail() {
                             style={{ background: "var(--green)", color: "#0a0f0a" }}>
                             Got it!
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Edit Club Modal ── */}
+            {showEditClub && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+                    <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-4" style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 16%)" }}>
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-base flex items-center gap-2" style={{ color: "hsl(150 10% 92%)" }}>
+                                <Pencil className="h-4 w-4" style={{ color: "#60a5fa" }} /> Edit Club
+                            </h3>
+                            <button onClick={() => setShowEditClub(false)} className="p-1.5 rounded-lg" style={{ color: "hsl(150 10% 50%)" }}>
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        {/* Name */}
+                        <div>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Club Name *</label>
+                            <input
+                                value={editName}
+                                onChange={e => setEditName(e.target.value)}
+                                maxLength={50}
+                                placeholder="Club name (3–50 chars)"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                            <textarea
+                                value={editDesc}
+                                onChange={e => setEditDesc(e.target.value)}
+                                rows={3}
+                                maxLength={500}
+                                placeholder="What is this club about?"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                            />
+                            <div className="text-right text-[10px] mt-0.5 font-mono" style={{ color: "hsl(150 10% 35%)" }}>{editDesc.length}/500</div>
+                        </div>
+
+                        {/* Privacy toggle */}
+                        <div>
+                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Privacy</label>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditIsPublic(true)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
+                                    style={{
+                                        background: editIsPublic ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
+                                        color: editIsPublic ? "var(--green)" : "hsl(150 10% 45%)",
+                                        border: `1px solid ${editIsPublic ? "rgba(19,236,106,0.3)" : "hsl(150 15% 18%)"}`,
+                                    }}>
+                                    <Globe className="h-3.5 w-3.5" /> Public
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setEditIsPublic(false)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
+                                    style={{
+                                        background: !editIsPublic ? "rgba(245,158,11,0.12)" : "hsl(150 15% 12%)",
+                                        color: !editIsPublic ? "#f59e0b" : "hsl(150 10% 45%)",
+                                        border: `1px solid ${!editIsPublic ? "rgba(245,158,11,0.3)" : "hsl(150 15% 18%)"}`,
+                                    }}>
+                                    <Lock className="h-3.5 w-3.5" /> Private
+                                </button>
+                            </div>
+                            {!editIsPublic && (
+                                <p className="text-[10px] mt-1.5" style={{ color: "hsl(150 10% 40%)" }}>Private clubs require an invite code to join</p>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 mt-1">
+                            <button
+                                onClick={() => updateClubMutation.mutate({ name: editName.trim(), description: editDesc.trim(), isPublic: editIsPublic })}
+                                disabled={editName.trim().length < 3 || updateClubMutation.isPending}
+                                className="flex-1 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 transition-all"
+                                style={{ background: "#13ec6a", color: "#0a0f0a" }}>
+                                {updateClubMutation.isPending ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button onClick={() => setShowEditClub(false)}
+                                className="px-4 py-2.5 rounded-xl text-sm font-semibold"
+                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 60%)" }}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Delete Club Modal ── */}
+            {showDeleteClub && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" style={{ animation: "toastIn 0.2s ease" }}>
+                    <div className="w-full max-w-md rounded-2xl p-6" style={{ background: "hsl(150 20% 7%)", border: "1px solid rgba(239,68,68,0.3)" }}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
+                                <AlertTriangle className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-bold" style={{ color: "hsl(150 10% 95%)" }}>Delete Club</h2>
+                                <p className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>{club.name}</p>
+                            </div>
+                        </div>
+
+                        <p className="text-sm mb-4" style={{ color: "hsl(150 10% 60%)" }}>
+                            This action is <strong>irreversible</strong>. It will permanently delete the club,
+                            including all habits, members, activity logs, and leaderboard data.
+                        </p>
+
+                        {deleteClubError && (
+                            <div className="mb-4 text-xs font-semibold p-3 rounded" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}>
+                                {deleteClubError}
+                            </div>
+                        )}
+
+                        <div className="mb-6">
+                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 70%)" }}>
+                                Type <strong style={{ color: "hsl(150 10% 90%)" }}>DELETE</strong> to confirm
+                            </label>
+                            <input
+                                type="text"
+                                value={deleteClubInput}
+                                onChange={e => setDeleteClubInput(e.target.value)}
+                                placeholder="DELETE"
+                                autoFocus
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                style={{ background: "hsl(150 20% 4%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-3 w-full">
+                            <button
+                                onClick={() => { setShowDeleteClub(false); setDeleteClubInput(""); setDeleteClubError("") }}
+                                disabled={deleteClubMutation.isPending}
+                                className="flex-1 py-2 rounded-lg text-sm font-semibold"
+                                style={{ background: "hsl(150 20% 12%)", color: "hsl(150 10% 70%)", border: "1px solid hsl(150 15% 18%)" }}>
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => deleteClubMutation.mutate()}
+                                disabled={deleteClubInput !== "DELETE" || deleteClubMutation.isPending}
+                                className="flex-1 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                                style={{ background: "#ef4444", color: "#fff" }}>
+                                {deleteClubMutation.isPending ? "Deleting..." : "Delete Club"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

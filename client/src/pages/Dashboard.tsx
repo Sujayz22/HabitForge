@@ -1,9 +1,11 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/contexts/ToastContext"
 import { useTodayLoggedClubHabits } from "@/hooks/useTodayLoggedClubHabits"
+import { scheduleEndOfDayReminder } from "@/hooks/useNotifications"
+import { useConfetti } from "@/hooks/useConfetti"
 import { habitService } from "@/services/habitService"
 import { clubService, type Club, type ClubHabit } from "@/services/clubService"
 import { taskService, type Task, TASK_XP } from "@/services/taskService"
@@ -37,15 +39,25 @@ interface ClubChallengesSectionProps {
     navigate: ReturnType<typeof useNavigate>
 }
 
+/** Shows "Club Challenges" label + cards only when >=1 club actually has habits */
 function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: ClubChallengesSectionProps) {
+    // habitCounts[clubId] is set once the child query resolves
+    const [habitCounts, setHabitCounts] = useState<Record<string, number>>({})
+    const totalHabits = Object.values(habitCounts).reduce((s, n) => s + n, 0)
+
+    const handleCount = (clubId: string, count: number) =>
+        setHabitCounts(prev => prev[clubId] === count ? prev : { ...prev, [clubId]: count })
+
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-                <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
-                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
-                    Club Challenges
-                </h2>
-            </div>
+            {totalHabits > 0 && (
+                <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        Club Challenges
+                    </h2>
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {clubs.map(club => (
                     <ClubHabitsInDashboard
@@ -55,6 +67,7 @@ function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogC
                         loggedClubHabitIds={loggedClubHabitIds}
                         onLogClubHabit={onLogClubHabit}
                         navigate={navigate}
+                        onHabitCount={count => handleCount(club._id, count)}
                     />
                 ))}
             </div>
@@ -62,18 +75,24 @@ function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogC
     )
 }
 
-function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: {
+function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogClubHabit, navigate, onHabitCount }: {
     club: Club
     completingId: string | null
     loggedClubHabitIds: Set<string>
     onLogClubHabit: (clubId: string, habitId: string, habitName: string) => void
     navigate: ReturnType<typeof useNavigate>
+    onHabitCount?: (count: number) => void
 }) {
     const { data: habits = [], isLoading } = useQuery<ClubHabit[]>({
         queryKey: ["club-habits", club._id],
         queryFn: () => clubService.getClubHabits(club._id),
         staleTime: 60_000,
     })
+
+    // Notify parent of habit count once query resolves
+    useEffect(() => {
+        if (!isLoading) onHabitCount?.(habits.length)
+    }, [isLoading, habits.length, onHabitCount])
 
     if (isLoading || habits.length === 0) return null
 
@@ -127,6 +146,7 @@ export function Dashboard() {
     const qc = useQueryClient()
     const navigate = useNavigate()
     const toast = useToast()
+    const { confetti } = useConfetti()
     const [completingHabitId, setCompletingHabitId] = useState<string | null>(null)
     const [completingTaskId, setCompletingTaskId] = useState<string | null>(null)
     const [completingClubHabitId, setCompletingClubHabitId] = useState<string | null>(null)
@@ -172,6 +192,7 @@ export function Dashboard() {
             const habitName = habits.find((h: any) => h._id === id)?.name
             const xp = data?.xpEarned ?? data?.log?.xpEarned ?? 0
             toast.xp(xp, habitName ? `${habitName} logged! 🔥` : "Habit logged! Keep the streak going 🔥")
+            confetti()
         },
         onError: (e: any) => {
             setCompletingHabitId(null)
@@ -191,6 +212,7 @@ export function Dashboard() {
             markClubHabitLogged(habitId)
             const xp = data?.xpEarned ?? 0
             toast.xp(xp, `${habitName} logged! 🏆`)
+            confetti()
         },
         onError: (e: any, { habitId }) => {
             setCompletingClubHabitId(null)
@@ -212,6 +234,7 @@ export function Dashboard() {
             qc.invalidateQueries({ queryKey: ["profile"] })
             setCompletingTaskId(null)
             toast.xp(data.xpEarned, "Task completed! 🎯")
+            confetti()
         },
         onError: (e: any) => {
             setCompletingTaskId(null)
@@ -245,6 +268,15 @@ export function Dashboard() {
     )
     const todayHabits = (habits as any[]).filter((h: any) => h.isActive !== false)
     const pendingTasks = (tasks as Task[]).filter(t => !t.isCompleted)
+    const pendingHabitCount = todayHabits.filter((h: any) => !todayCompletedIds.has(h._id)).length
+    const pendingTaskCount = pendingTasks.length
+
+    // ── Schedule end-of-day OS notification via Service Worker ────────────────
+    // Fires once per calendar day at 9 PM if there are items left to do.
+    useEffect(() => {
+        if (pendingHabitCount === 0 && pendingTaskCount === 0) return
+        scheduleEndOfDayReminder(pendingHabitCount, pendingTaskCount, 0)
+    }, [pendingHabitCount, pendingTaskCount])
 
     const graceSilver = profile?.graceSilverCards || 0
     const graceGold = profile?.graceGoldCards || 0

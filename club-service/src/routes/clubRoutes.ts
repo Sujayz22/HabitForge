@@ -4,7 +4,10 @@ import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
 
-// All routes require authentication
+// ── Internal routes (no auth — called by other services) ──────────────────────
+router.post('/internal/user-deleted', (req, res) => clubController.handleUserDeleted(req, res));
+
+// All authenticated routes below
 router.use(authenticate);
 
 // Public clubs discovery (no membership required)
@@ -17,7 +20,9 @@ router.post('/clubs/join-by-code', clubController.joinByCode);
 router.post('/clubs', clubController.createClub);
 router.get('/clubs', clubController.getUserClubs);
 router.get('/clubs/:clubId', clubController.getClubDetails);
+router.put('/clubs/:clubId', clubController.updateClub);
 router.post('/clubs/:clubId/join', clubController.joinClub);
+router.delete('/clubs/:clubId', clubController.deleteClubById);
 
 router.post('/clubs/:clubId/leave', clubController.leaveClub);
 router.get('/clubs/:clubId/members', clubController.getClubMembers);
