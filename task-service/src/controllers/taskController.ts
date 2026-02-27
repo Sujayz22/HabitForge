@@ -24,19 +24,25 @@ export async function createTask(req: AuthRequest, res: Response) {
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
 
-        const { title, description, difficulty } = req.body;
+        const { title, description, difficulty, priority, deadline, reminder } = req.body;
         if (!title) return res.status(400).json({ success: false, message: 'Title is required' });
 
         const diff: TaskDifficulty = Object.values(TaskDifficulty).includes(difficulty)
             ? difficulty
             : TaskDifficulty.MEDIUM;
 
-        const task = await Task.create({ userId, title, description, difficulty: diff });
+        const task = await Task.create({
+            userId, title, description, difficulty: diff,
+            priority: priority || undefined,
+            deadline: deadline ? new Date(deadline) : undefined,
+            reminder: reminder ?? false,
+        });
         return res.status(201).json({ success: true, data: task });
     } catch (err: any) {
         return res.status(400).json({ success: false, message: err.message });
     }
 }
+
 
 // ── POST /api/tasks/:taskId/complete ────────────────────────────
 export async function completeTask(req: AuthRequest, res: Response) {
@@ -140,3 +146,36 @@ export async function getTaskStats(req: AuthRequest, res: Response) {
         return res.status(500).json({ success: false, message: err.message });
     }
 }
+
+// ── PUT /api/tasks/:taskId ───────────────────────────────────────
+export async function updateTask(req: AuthRequest, res: Response) {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+        const { taskId } = req.params;
+        const task = await Task.findOne({ _id: taskId, userId });
+        if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
+        if (task.isCompleted) return res.status(400).json({ success: false, message: 'Cannot edit a completed task' });
+
+        const { title, description, priority, deadline, reminder } = req.body;
+
+        if (title !== undefined) {
+            if (!title.trim()) return res.status(400).json({ success: false, message: 'Title cannot be empty' });
+            task.title = title.trim();
+        }
+        if (description !== undefined) task.description = description.trim() || undefined;
+        if (priority !== undefined) task.priority = priority || undefined;
+        if (deadline !== undefined) task.deadline = deadline ? new Date(deadline) : undefined;
+        if (reminder !== undefined) task.reminder = reminder;
+
+        // If reminder is set but no deadline, clear the reminder flag
+        if (!task.deadline) task.reminder = false;
+
+        await task.save();
+        return res.json({ success: true, data: task });
+    } catch (err: any) {
+        return res.status(400).json({ success: false, message: err.message });
+    }
+}
+

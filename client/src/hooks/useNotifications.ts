@@ -83,6 +83,28 @@ export async function scheduleEndOfDayReminder(
 }
 
 /**
+ * Schedules a browser notification for a specific task deadline via Service Worker.
+ * Call after creating/updating a task that has reminder=true.
+ */
+export async function scheduleTaskReminder(taskId: string, taskTitle: string, deadline: Date) {
+    if (!("Notification" in window)) return
+    if (Notification.permission !== "granted") return
+
+    const fireAtMs = deadline.getTime()
+    if (fireAtMs <= Date.now()) return   // deadline already passed
+
+    const sw = await getSW()
+    if (!sw) return
+
+    sw.postMessage({
+        type: "SCHEDULE_TASK_REMINDER",
+        taskId,
+        taskTitle,
+        fireAtMs,
+    })
+}
+
+/**
  * Returns a `notify` helper for one-off immediate OS notifications.
  * (Used for task/habit completion events.)
  */

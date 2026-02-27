@@ -7,6 +7,13 @@ export enum TaskDifficulty {
     EPIC = 'EPIC',
 }
 
+export enum TaskPriority {
+    LOW = 'LOW',
+    MEDIUM = 'MEDIUM',
+    HIGH = 'HIGH',
+    CRITICAL = 'CRITICAL',
+}
+
 export const TASK_XP: Record<TaskDifficulty, number> = {
     [TaskDifficulty.EASY]: 10,
     [TaskDifficulty.MEDIUM]: 25,
@@ -19,6 +26,9 @@ export interface ITask extends Document {
     title: string;
     description?: string;
     difficulty: TaskDifficulty;
+    priority?: TaskPriority;
+    deadline?: Date;
+    reminder?: boolean;
     isCompleted: boolean;
     completedAt?: Date;
     xpEarned?: number;
@@ -29,14 +39,21 @@ export interface ITask extends Document {
 const TaskSchema = new Schema<ITask>(
     {
         userId: { type: String, required: true, index: true },
-        title: { type: String, required: true, trim: true, maxlength: 200 },
-        description: { type: String, trim: true, maxlength: 500 },
+        title: { type: String, required: true, trim: true, maxlength: 100 },
+        description: { type: String, trim: true, maxlength: 200 },
         difficulty: {
             type: String,
             enum: Object.values(TaskDifficulty),
             required: true,
             default: TaskDifficulty.MEDIUM,
         },
+        priority: {
+            type: String,
+            enum: Object.values(TaskPriority),
+            required: false,
+        },
+        deadline: { type: Date, required: false },
+        reminder: { type: Boolean, default: false },
         isCompleted: { type: Boolean, default: false },
         completedAt: { type: Date },
         xpEarned: { type: Number },
@@ -46,5 +63,7 @@ const TaskSchema = new Schema<ITask>(
 
 TaskSchema.index({ userId: 1, createdAt: -1 });
 TaskSchema.index({ userId: 1, isCompleted: 1 });
+TaskSchema.index({ userId: 1, deadline: 1 });
 
 export const Task = mongoose.model<ITask>('Task', TaskSchema);
+
