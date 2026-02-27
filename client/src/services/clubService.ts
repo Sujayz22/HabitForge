@@ -145,6 +145,10 @@ const clubService = {
     leaveClub: async (clubId: string): Promise<void> => {
         await api.post(`/clubs/${clubId}/leave`)
     },
+
+    deleteClub: async (clubId: string): Promise<void> => {
+        await api.delete(`/clubs/${clubId}`)
+    },
 }
 
 export { clubService }

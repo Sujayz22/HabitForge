@@ -476,3 +476,37 @@ export async function sendChatMessage(req: AuthRequest, res: Response, next: Nex
         });
     }
 }
+
+/**
+ * Internal: handle user account deletion — transfer ownership or delete clubs
+ * Called by user-service (no auth token required)
+ */
+export async function handleUserDeleted(req: any, res: Response) {
+    try {
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'userId is required' });
+        }
+        await clubService.handleUserDeleted(userId);
+        res.status(200).json({ success: true, message: 'Club cleanup completed' });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message || 'Club cleanup failed' });
+    }
+}
+
+/**
+ * Delete a club (owner only)
+ */
+export async function deleteClubById(req: AuthRequest, res: Response) {
+    try {
+        const { clubId } = req.params;
+        const userId = req.user!.userId;
+        await clubService.deleteClub(clubId, userId);
+        res.status(200).json({ success: true, message: 'Club deleted successfully' });
+    } catch (error: any) {
+        const status = error.message?.includes('Only the club owner') ? 403 : 400;
+        res.status(status).json({ success: false, message: error.message || 'Failed to delete club' });
+    }
+}
+
+

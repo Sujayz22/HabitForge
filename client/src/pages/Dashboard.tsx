@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
@@ -37,15 +37,25 @@ interface ClubChallengesSectionProps {
     navigate: ReturnType<typeof useNavigate>
 }
 
+/** Shows "Club Challenges" label + cards only when >=1 club actually has habits */
 function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: ClubChallengesSectionProps) {
+    // habitCounts[clubId] is set once the child query resolves
+    const [habitCounts, setHabitCounts] = useState<Record<string, number>>({})
+    const totalHabits = Object.values(habitCounts).reduce((s, n) => s + n, 0)
+
+    const handleCount = (clubId: string, count: number) =>
+        setHabitCounts(prev => prev[clubId] === count ? prev : { ...prev, [clubId]: count })
+
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-                <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
-                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
-                    Club Challenges
-                </h2>
-            </div>
+            {totalHabits > 0 && (
+                <div className="flex items-center gap-2">
+                    <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        Club Challenges
+                    </h2>
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {clubs.map(club => (
                     <ClubHabitsInDashboard
@@ -55,6 +65,7 @@ function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogC
                         loggedClubHabitIds={loggedClubHabitIds}
                         onLogClubHabit={onLogClubHabit}
                         navigate={navigate}
+                        onHabitCount={count => handleCount(club._id, count)}
                     />
                 ))}
             </div>
@@ -62,18 +73,24 @@ function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogC
     )
 }
 
-function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogClubHabit, navigate }: {
+function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogClubHabit, navigate, onHabitCount }: {
     club: Club
     completingId: string | null
     loggedClubHabitIds: Set<string>
     onLogClubHabit: (clubId: string, habitId: string, habitName: string) => void
     navigate: ReturnType<typeof useNavigate>
+    onHabitCount?: (count: number) => void
 }) {
     const { data: habits = [], isLoading } = useQuery<ClubHabit[]>({
         queryKey: ["club-habits", club._id],
         queryFn: () => clubService.getClubHabits(club._id),
         staleTime: 60_000,
     })
+
+    // Notify parent of habit count once query resolves
+    useEffect(() => {
+        if (!isLoading) onHabitCount?.(habits.length)
+    }, [isLoading, habits.length, onHabitCount])
 
     if (isLoading || habits.length === 0) return null
 

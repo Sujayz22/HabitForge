@@ -7,6 +7,7 @@ export interface IClubHabit extends Document {
     category: string;
     difficulty: number;
     frequency: string;
+    targetDays?: number[];
     createdBy: string;
     createdAt: Date;
 }
@@ -40,6 +41,15 @@ const ClubHabitSchema = new Schema<IClubHabit>({
         type: String,
         required: true,
         enum: ['DAILY', 'WEEKLY', 'CUSTOM']
+    },
+    targetDays: {
+        type: [Number],
+        validate: {
+            validator: function (days: number[]) {
+                return days.every(day => day >= 0 && day <= 6);
+            },
+            message: 'Target days must be between 0 (Sunday) and 6 (Saturday)'
+        }
     },
     createdBy: {
         type: String,

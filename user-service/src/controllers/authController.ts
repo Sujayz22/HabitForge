@@ -1,6 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
 import jwt from 'jsonwebtoken';
+import * as http from 'http';
+import * as https from 'https';
+
+const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL || 'http://localhost:3003';
+
+/** Fire-and-forget POST to club-service internal endpoint */
+function notifyClubService(path: string, body: object): Promise<void> {
+    return new Promise((resolve) => {
+        const data = JSON.stringify(body);
+        const url = new URL(CLUB_SERVICE_URL + path);
+        const lib = url.protocol === 'https:' ? https : http;
+        const req = lib.request(
+            { hostname: url.hostname, port: url.port || (url.protocol === 'https:' ? 443 : 80), path: url.pathname, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } },
+            () => resolve()
+        );
+        req.on('error', (e) => { console.warn('[notifyClubService] error:', e.message); resolve(); });
+        req.setTimeout(5000, () => { req.destroy(); resolve(); });
+        req.write(data);
+        req.end();
+    });
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
@@ -213,6 +234,13 @@ export async function deleteAccount(req: Request, res: Response, next: NextFunct
     try {
         const userId = (req as any).user?.userId;
         if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+        // Notify club-service to transfer/delete clubs owned by this user (best-effort)
+        try {
+            await notifyClubService('/api/internal/user-deleted', { userId });
+        } catch (clubErr: any) {
+            console.warn('[deleteAccount] Club cleanup failed:', clubErr?.message);
+        }
 
         await authService.deleteUser(userId);
         res.status(200).json({ success: true, message: 'Account deleted successfully' });

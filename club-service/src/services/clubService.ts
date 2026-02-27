@@ -273,7 +273,10 @@ export async function acceptClubHabit(clubId: string, clubHabitId: string, userI
                 description: `[Club: ${clubId}] ${clubHabit.description}`,
                 category: clubHabit.category,
                 difficulty: clubHabit.difficulty,
-                frequency: clubHabit.frequency
+                frequency: clubHabit.frequency,
+                ...(clubHabit.frequency === 'CUSTOM' && clubHabit.targetDays?.length
+                    ? { targetDays: clubHabit.targetDays }
+                    : {})
             },
             {
                 headers: {
@@ -379,7 +382,10 @@ export async function logClubHabit(clubId: string, clubHabitId: string, userId: 
                         : 2,
                     frequency: ['DAILY', 'WEEKLY', 'CUSTOM'].includes(clubHabit.frequency)
                         ? clubHabit.frequency
-                        : 'DAILY'
+                        : 'DAILY',
+                    ...(clubHabit.frequency === 'CUSTOM' && clubHabit.targetDays?.length
+                        ? { targetDays: clubHabit.targetDays }
+                        : {})
                 },
                 {
                     headers: {
@@ -445,4 +451,94 @@ export async function logClubHabit(clubId: string, clubHabitId: string, userId: 
         const msg = error?.response?.data?.message || error.message;
         throw new Error(msg || 'Failed to log habit completion');
     }
+}
+
+/**
+ * Handle account deletion: transfer ownership or delete clubs
+ * Called by user-service when a user deletes their account.
+ */
+export async function handleUserDeleted(userId: string): Promise<void> {
+    // ── Step 1: Handle clubs this user OWNS ──────────────────────────────────
+    const ownedClubs = await Club.find({ ownerId: userId });
+
+    for (const club of ownedClubs) {
+        const clubId = club._id.toString();
+
+        // Find other members sorted by joinedAt ascending (earliest joiner = next owner)
+        const otherMembers = await Membership.find({
+            clubId,
+            userId: { $ne: userId }
+        }).sort({ joinedAt: 1 });
+
+        if (otherMembers.length > 0) {
+            // ── Transfer ownership ────────────────────────────────────────────
+            const newOwner = otherMembers[0];
+
+            // Promote new owner
+            await Membership.updateOne(
+                { _id: newOwner._id },
+                { $set: { role: MemberRole.OWNER } }
+            );
+
+            // Update club's ownerId
+            await Club.findByIdAndUpdate(clubId, {
+                $set: { ownerId: newOwner.userId },
+                $inc: { memberCount: -1 }   // decrement for the departing owner
+            });
+
+            // Remove the deleted user's membership record so they vanish from member lists
+            await Membership.deleteOne({ clubId, userId });
+
+            // Log the ownership transfer
+            await ActivityLog.create({
+                clubId,
+                userId: newOwner.userId,
+                username: newOwner.username,
+                action: 'JOINED',
+                timestamp: new Date()
+            });
+        } else {
+            // ── No other members — nuke the club and everything in it ─────────
+            const { AcceptedHabit } = await import('../models/AcceptedHabit');
+            await Promise.all([
+                ClubHabit.deleteMany({ clubId }),
+                Membership.deleteMany({ clubId }),
+                ActivityLog.deleteMany({ clubId }),
+                AcceptedHabit.deleteMany({ clubId }),
+            ]);
+            await Club.findByIdAndDelete(clubId);
+        }
+    }
+
+    // ── Step 2: Remove the user from any clubs they were a non-owner member of ─
+    const nonOwnerMemberships = await Membership.find({ userId, role: { $ne: MemberRole.OWNER } });
+    for (const m of nonOwnerMemberships) {
+        await Membership.deleteOne({ _id: m._id });
+        await Club.findByIdAndUpdate(m.clubId, { $inc: { memberCount: -1 } });
+    }
+}
+
+
+/**
+ * Delete a club (owner only)
+ */
+export async function deleteClub(clubId: string, userId: string): Promise<void> {
+    const club = await Club.findById(clubId);
+    if (!club) {
+        throw new Error('Club not found');
+    }
+
+    // Verify requester is the owner
+    const membership = await Membership.findOne({ clubId, userId });
+    if (!membership || membership.role !== MemberRole.OWNER) {
+        throw new Error('Only the club owner can delete this club');
+    }
+
+    // Delete all related data
+    await ClubHabit.deleteMany({ clubId });
+    await Membership.deleteMany({ clubId });
+    await ActivityLog.deleteMany({ clubId });
+    const { AcceptedHabit } = await import('../models/AcceptedHabit');
+    await AcceptedHabit.deleteMany({ clubId });
+    await Club.findByIdAndDelete(clubId);
 }

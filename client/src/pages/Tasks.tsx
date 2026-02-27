@@ -211,21 +211,28 @@ export function Tasks() {
                     ) : (
                         <div className="space-y-2">
                             {pending.map((task: Task) => (
-                                <div key={task._id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl"
+                                <div key={task._id} className="group/task flex items-start gap-3 py-2.5 px-3 rounded-xl cursor-default transition-all duration-200"
                                     style={{ background: "hsl(150 20% 9%)", border: "1px solid hsl(150 15% 12%)" }}>
                                     <button
                                         onClick={() => !completeMutation.isPending && completeMutation.mutate(task._id)}
-                                        className="flex-shrink-0 h-5 w-5 rounded-full border-2 transition-all hover:scale-110"
+                                        className="flex-shrink-0 mt-0.5 h-5 w-5 rounded-full border-2 transition-all hover:scale-110"
                                         style={{ borderColor: "#13ec6a" }}
                                         title="Mark complete"
                                     />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 88%)" }}>
-                                            {task.title}
+                                    <div className="flex-1 min-w-0 overflow-hidden">
+                                        <div
+                                            className="overflow-hidden transition-all duration-300 ease-in-out"
+                                            style={{ maxHeight: "var(--task-expanded, 1.35rem)" }}
+                                            onMouseEnter={e => (e.currentTarget.style.maxHeight = "12rem")}
+                                            onMouseLeave={e => (e.currentTarget.style.maxHeight = "1.35rem")}
+                                        >
+                                            <div className="text-sm font-semibold leading-snug break-words" style={{ color: "hsl(150 10% 88%)" }}>
+                                                {task.title}
+                                            </div>
+                                            {task.description && (
+                                                <div className="text-xs mt-0.5 break-words" style={{ color: "hsl(150 10% 45%)" }}>{task.description}</div>
+                                            )}
                                         </div>
-                                        {task.description && (
-                                            <div className="text-xs truncate" style={{ color: "hsl(150 10% 45%)" }}>{task.description}</div>
-                                        )}
                                     </div>
                                     <DiffBadge diff={task.difficulty} />
                                     <span className="text-xs font-bold flex-shrink-0" style={{ color: "#13ec6a" }}>
@@ -259,12 +266,19 @@ export function Tasks() {
                     ) : (
                         <div className="space-y-2">
                             {completed.map((task: Task) => (
-                                <div key={task._id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl opacity-60"
+                                <div key={task._id} className="group/task flex items-start gap-3 py-2.5 px-3 rounded-xl opacity-60 cursor-default"
                                     style={{ background: "hsl(150 20% 8%)", border: "1px solid hsl(150 15% 10%)" }}>
-                                    <CheckCircle2 className="flex-shrink-0 h-5 w-5" style={{ color: "#22c55e" }} />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-semibold line-through truncate" style={{ color: "hsl(150 10% 75%)" }}>
-                                            {task.title}
+                                    <CheckCircle2 className="flex-shrink-0 mt-0.5 h-5 w-5" style={{ color: "#22c55e" }} />
+                                    <div className="flex-1 min-w-0 overflow-hidden">
+                                        <div
+                                            className="overflow-hidden transition-all duration-300 ease-in-out"
+                                            style={{ maxHeight: "1.35rem" }}
+                                            onMouseEnter={e => (e.currentTarget.style.maxHeight = "12rem")}
+                                            onMouseLeave={e => (e.currentTarget.style.maxHeight = "1.35rem")}
+                                        >
+                                            <div className="text-sm font-semibold line-through leading-snug break-words" style={{ color: "hsl(150 10% 75%)" }}>
+                                                {task.title}
+                                            </div>
                                         </div>
                                     </div>
                                     <DiffBadge diff={task.difficulty} />
