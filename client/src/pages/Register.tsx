@@ -19,8 +19,8 @@ export function Register() {
         setLoading(true)
         try {
             const response = await api.post("/auth/register", { username, email, password })
-            const { accessToken, user } = response.data.data
-            login(accessToken, user)
+            const { user } = response.data.data
+            login(user)
             navigate("/dashboard")
         } catch (err: any) {
             setError(err.response?.data?.message || "Failed to register")

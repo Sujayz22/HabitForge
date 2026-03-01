@@ -36,6 +36,13 @@ function generateTokens(userId: string, email: string, mode: string) {
     return { accessToken, refreshToken };
 }
 
+const COOKIE_OPTS_BASE = { httpOnly: true, sameSite: 'lax' as const, secure: false, path: '/' };
+
+function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+    res.cookie('hf_access', accessToken, { ...COOKIE_OPTS_BASE, maxAge: 15 * 60 * 1000 });
+    res.cookie('hf_refresh', refreshToken, { ...COOKIE_OPTS_BASE, maxAge: 7 * 24 * 60 * 60 * 1000 });
+}
+
 export async function register(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, username, password, mode } = req.body;
@@ -45,9 +52,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
         if (password.length < 6) {
             return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
         }
-        const user = await authService.registerUser({ email, username, password, mode });
+        await authService.registerUser({ email, username, password, mode });
         const authData = await authService.loginUser({ email, password }, generateTokens);
-        res.status(201).json({ success: true, message: 'User registered successfully', data: authData });
+        setAuthCookies(res, authData.accessToken, authData.refreshToken);
+        res.status(201).json({ success: true, message: 'User registered successfully', data: { user: authData.user } });
     } catch (error: any) {
         res.status(400).json({ success: false, message: error.message || 'Registration failed' });
     }
@@ -60,7 +68,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             return res.status(400).json({ success: false, message: 'Email/username and password are required' });
         }
         const authData = await authService.loginUser({ email, username, password }, generateTokens);
-        res.status(200).json({ success: true, message: 'Login successful', data: authData });
+        setAuthCookies(res, authData.accessToken, authData.refreshToken);
+        res.status(200).json({ success: true, message: 'Login successful', data: { user: authData.user } });
     } catch (error: any) {
         res.status(401).json({ success: false, message: error.message || 'Login failed' });
     }
@@ -68,11 +77,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
     try {
-        const { refreshToken } = req.body;
+        const refreshToken = (req as any).cookies?.hf_refresh || req.body?.refreshToken;
         if (!refreshToken) {
             return res.status(400).json({ success: false, message: 'Refresh token is required' });
         }
         await authService.logoutUser(refreshToken);
+        res.clearCookie('hf_access', { path: '/' });
+        res.clearCookie('hf_refresh', { path: '/' });
         res.status(200).json({ success: true, message: 'Logout successful' });
     } catch (error: any) {
         res.status(400).json({ success: false, message: error.message || 'Logout failed' });

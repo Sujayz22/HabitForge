@@ -103,8 +103,8 @@ export function Login() {
                 ? { email: identifier.trim(), password }
                 : { username: identifier.trim(), password }
             const response = await api.post("/auth/login", payload)
-            const { accessToken, user } = response.data.data
-            login(accessToken, user)
+            const { user } = response.data.data
+            login(user)
             navigate("/dashboard")
         } catch (err: any) {
             setError(err.response?.data?.message || "Incorrect credentials")
