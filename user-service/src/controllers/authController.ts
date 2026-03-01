@@ -3,6 +3,7 @@ import * as authService from '../services/authService';
 import jwt from 'jsonwebtoken';
 import * as http from 'http';
 import * as https from 'https';
+import { redisClient } from '../index';
 
 const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL || 'http://localhost:3003';
 
@@ -77,10 +78,27 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
     try {
+        const accessToken = (req as any).cookies?.hf_access;
         const refreshToken = (req as any).cookies?.hf_refresh || req.body?.refreshToken;
         if (!refreshToken) {
             return res.status(400).json({ success: false, message: 'Refresh token is required' });
         }
+
+        // Blacklist the access token in Redis so it can't be reused
+        if (accessToken && redisClient && redisClient.status === 'ready') {
+            try {
+                const decoded = jwt.decode(accessToken) as { exp?: number } | null;
+                if (decoded?.exp) {
+                    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+                    if (ttl > 0) {
+                        await redisClient.setex(`blacklist:${accessToken}`, ttl, '1');
+                    }
+                }
+            } catch (blacklistErr) {
+                console.warn('[logout] Failed to blacklist token:', (blacklistErr as Error).message);
+            }
+        }
+
         await authService.logoutUser(refreshToken);
         res.clearCookie('hf_access', { path: '/' });
         res.clearCookie('hf_refresh', { path: '/' });
