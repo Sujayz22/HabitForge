@@ -1,9 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { ToastProvider } from "@/contexts/ToastContext"
 import { useNotificationPermission } from "@/hooks/useNotifications"
 import { MainLayout } from "@/components/layouts/MainLayout"
+import { LandingPage } from "@/pages/LandingPage"
+import { ComingSoon } from "@/pages/ComingSoon"
 import { Dashboard } from "@/pages/Dashboard"
 import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
@@ -41,17 +43,22 @@ function App() {
           <AppShell>
             <BrowserRouter>
               <Routes>
+                {/* Public Drop-in Page */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/coming-soon" element={<ComingSoon />} />
+
+                {/* Public Auth Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
+                {/* Authenticated Dashboard Core */}
                 <Route element={
                   <ProtectedRoute>
                     <MainLayout />
                   </ProtectedRoute>
                 }>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/habits" element={<Habits />} />
                   <Route path="/tasks" element={<Tasks />} />
