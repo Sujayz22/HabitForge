@@ -5,7 +5,7 @@ import { AcceptedHabit } from '../models/AcceptedHabit';
 import { ActivityLog } from '../models/ActivityLog';
 import axios from 'axios';
 
-const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL || 'http://localhost:3002';
+const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL as string;
 
 /**
  * Generate a random alphanumeric invite code

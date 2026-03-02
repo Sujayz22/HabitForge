@@ -8,7 +8,7 @@ RUN cd shared && npm install && npm run build
 
 # Copy service and install deps (includes @habitforge/shared: file:../shared)
 COPY club-service/ ./club-service/
-RUN cd club-service && npm install --include=dev
+RUN cd club-service && npm install && npm run build
 
 EXPOSE 3003
-CMD ["sh", "-c", "cd club-service && npm run dev"]
+CMD ["sh", "-c", "cd club-service && node dist/index.js"]

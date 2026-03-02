@@ -8,7 +8,7 @@ RUN cd shared && npm install && npm run build
 
 # Copy service and install deps (includes @habitforge/shared: file:../shared)
 COPY analytics-service/ ./analytics-service/
-RUN cd analytics-service && npm install --include=dev
+RUN cd analytics-service && npm install && npm run build
 
 EXPOSE 3004
-CMD ["sh", "-c", "cd analytics-service && npm run dev"]
+CMD ["sh", "-c", "cd analytics-service && node dist/index.js"]

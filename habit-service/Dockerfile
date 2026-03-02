@@ -8,7 +8,7 @@ RUN cd shared && npm install && npm run build
 
 # Copy service and install deps (includes @habitforge/shared: file:../shared)
 COPY habit-service/ ./habit-service/
-RUN cd habit-service && npm install --include=dev
+RUN cd habit-service && npm install && npm run build
 
 EXPOSE 3002
-CMD ["sh", "-c", "cd habit-service && npm run dev"]
+CMD ["sh", "-c", "cd habit-service && node dist/index.js"]

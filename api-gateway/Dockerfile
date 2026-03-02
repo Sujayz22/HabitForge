@@ -8,7 +8,7 @@ RUN cd shared && npm install && npm run build
 
 # Copy service and install deps (includes @habitforge/shared: file:../shared)
 COPY api-gateway/ ./api-gateway/
-RUN cd api-gateway && npm install --include=dev
+RUN cd api-gateway && npm install && npm run build
 
 EXPOSE 3000
-CMD ["sh", "-c", "cd api-gateway && npm run dev"]
+CMD ["sh", "-c", "cd api-gateway && node dist/index.js"]

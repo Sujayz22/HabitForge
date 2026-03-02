@@ -4,7 +4,7 @@ import { Task, TaskDifficulty, TASK_XP } from '../models/Task';
 import { DailyTaskStats } from '../models/DailyTaskStats';
 import { AuthRequest } from '../middleware/auth';
 
-const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3001';
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL as string;
 
 // ── GET /api/tasks ──────────────────────────────────────────────
 export async function getTasks(req: AuthRequest, res: Response) {

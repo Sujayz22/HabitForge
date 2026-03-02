@@ -5,7 +5,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { redisClient } from '../index';
 
-const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL || 'http://localhost:3003';
+const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL as string;
 
 /** Fire-and-forget POST to club-service internal endpoint */
 function notifyClubService(path: string, body: object): Promise<void> {
@@ -339,7 +339,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
             return res.status(200).json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
         }
 
-        const resetLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${rawToken}`;
+        const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
 
         try {
             const { sendPasswordResetEmail } = await import('../utils/mailer');

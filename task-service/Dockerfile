@@ -8,7 +8,7 @@ RUN cd shared && npm install && npm run build
 
 # Copy service and install deps (includes @habitforge/shared: file:../shared)
 COPY task-service/ ./task-service/
-RUN cd task-service && npm install --include=dev
+RUN cd task-service && npm install && npm run build
 
 EXPOSE 3005
-CMD ["sh", "-c", "cd task-service && npm run dev"]
+CMD ["sh", "-c", "cd task-service && node dist/index.js"]

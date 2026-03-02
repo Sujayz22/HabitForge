@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 
-const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3001';
-const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL || 'http://localhost:3002';
-const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL || 'http://localhost:3003';
-const ANALYTICS_SERVICE_URL = process.env.ANALYTICS_SERVICE_URL || 'http://localhost:3004';
-const TASK_SERVICE_URL = process.env.TASK_SERVICE_URL || 'http://localhost:3005';
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL as string;
+const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL as string;
+const CLUB_SERVICE_URL = process.env.CLUB_SERVICE_URL as string;
+const ANALYTICS_SERVICE_URL = process.env.ANALYTICS_SERVICE_URL as string;
+const TASK_SERVICE_URL = process.env.TASK_SERVICE_URL as string;
 
 /**
  * Forward request to a service

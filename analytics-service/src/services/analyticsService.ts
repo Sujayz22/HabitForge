@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { redisClient } from '../index';
 
-const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:3001';
-const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL || 'http://localhost:3002';
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL as string;
+const HABIT_SERVICE_URL = process.env.HABIT_SERVICE_URL as string;
 
 const CACHE_TTL = 300; // 5 minutes
 

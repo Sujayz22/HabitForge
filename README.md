@@ -89,6 +89,10 @@ HabitForge is an adaptive habit-tracking platform featuring three distinct behav
 - Rate limiting implementation
 - Async job queues for background processing
 
+### Metrics Storage: Prometheus
+- Time-series database for scraping service metrics
+- Stores response latencies, HTTP request counts, and memory/CPU usage for all services
+
 ##  Core Features
 
 ###  Gamification System
@@ -162,9 +166,12 @@ User requests mode change →
 
 ##  Deployment
 
+### Environment Configuration
+The entire application stack relies on a centralized `.env` configuration for secrets, database URIs, and inter-service URLs. 
+
 ### Development Environment
 ```yaml
-# Docker Compose Setup
+# Docker Compose Setup (docker-compose.yml)
 services:
   api-gateway:3000
   user-service:3001
@@ -173,17 +180,23 @@ services:
   analytics-service:3004
   task-service:3005
   redis:6379
-  # local mongodb is commented out; external UI provided.
+  prometheus:9090
+  grafana:3006
 ```
+For local development using Docker Desktop, you can utilize the `start-services-desktop.sh` script to streamline startup. For production deployment on a cloud compute instance, please refer to our `DEPLOYMENT_GUIDE.md`.
 
 ##  Monitoring & Metrics
 
 ### Health Checks
 - `/health`: Service status, database connectivity, uptime
-- `/metrics`: Prometheus metrics endpoint
+- `/metrics`: Prometheus metrics endpoint exposed by all services (powered by `express-prom-bundle`)
+
+### Centralized Monitoring Stack
+- **Prometheus**: Automatically scrapes `/metrics` from all running containers internally.
+- **Grafana**: Pre-provisioned dashboards visualizing container health, API response latencies, and route usage.
 
 ### Key Metrics Tracked
-- **Technical**: Response latency, error rates, cache hit ratios
+- **Technical**: Response latency (p95, p99), error rates, memory footprint, cache hit ratios
 - **Business**: Daily active users, habit completion rates, club engagement
 - **Performance**: Database query times, Redis latency, API throughput
 
@@ -199,7 +212,12 @@ habitforge/
 ├── analytics-service/    # Analytics & Worker Service
 ├── task-service/         # Task Management Service
 ├── shared/               # Shared libraries & types
+├── prometheus/           # Prometheus scraping configuration
+├── grafana/              # Grafana dashboards & provisioning
 ├── docker-compose.yml    # Development environment
+├── .env.example          # Environment variables template
+├── start-services-desktop.sh # Easy local Docker startup script
+│── DEPLOYMENT_GUIDE.md   # Production deployment instructions
 └── docs/                 # General documentation & testing guides
 ```
 
@@ -217,11 +235,20 @@ habitforge/
 git clone https://github.com/yourusername/habitforge.git
 cd habitforge
 
-# Start all services
-docker-compose up -d
+# Configure Environment Variables
+cp .env.example .env
+# Edit .env with your specific MongoDB URI and JWT Keys if needed
 
-# Access the API
-curl http://localhost:3000/health
+# Start all services
+docker-compose --env-file .env up -d --build
+# Alternatively, for Docker Desktop:
+# ./start-services-desktop.sh
+
+# Access the API Gateway
+curl http://localhost:3000/api/health
+
+# Access Grafana Monitoring Dashboard
+# Browse to: http://localhost:3006
 ```
 
 ## 📄 License
