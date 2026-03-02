@@ -7,8 +7,6 @@ services:
     image: redis:7.0-alpine
     container_name: habitforge-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -23,8 +21,8 @@ services:
   # API Gateway Service
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api-gateway/Dockerfile
     container_name: habitforge-api-gateway
     restart: unless-stopped
     ports:
@@ -49,8 +47,8 @@ services:
   # User Service
   user-service:
     build:
-      context: ./user-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: user-service/Dockerfile
     container_name: habitforge-user-service
     restart: unless-stopped
     env_file:
@@ -63,8 +61,8 @@ services:
   # Habit & Gamification Service
   habit-service:
     build:
-      context: ./habit-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: habit-service/Dockerfile
     container_name: habitforge-habit-service
     restart: unless-stopped
     env_file:
@@ -77,8 +75,8 @@ services:
   # Club & Leaderboard Service
   club-service:
     build:
-      context: ./club-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: club-service/Dockerfile
     container_name: habitforge-club-service
     restart: unless-stopped
     env_file:
@@ -91,8 +89,8 @@ services:
   # Analytics & Worker Service
   analytics-service:
     build:
-      context: ./analytics-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: analytics-service/Dockerfile
     container_name: habitforge-analytics-service
     restart: unless-stopped
     env_file:
@@ -105,8 +103,8 @@ services:
   # Task Service
   task-service:
     build:
-      context: ./task-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: task-service/Dockerfile
     container_name: habitforge-task-service
     restart: unless-stopped
     env_file:
