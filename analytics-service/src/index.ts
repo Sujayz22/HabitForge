@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { createMetricsMiddleware } from '@habitforge/shared';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -11,13 +12,16 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3004;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/habitforge';
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Add metrics middleware
+app.use(createMetricsMiddleware('analytics-service') as any);
 
 // Exported Redis client for analytics caching
 export let redisClient: Redis | null = null;
@@ -31,7 +35,7 @@ mongoose.connect(MONGODB_URI)
 async function initRedis() {
     try {
         const client = new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
+            host: process.env.REDIS_HOST as string,
             port: parseInt(process.env.REDIS_PORT || '6379'),
             password: process.env.REDIS_PASSWORD,
             lazyConnect: true,

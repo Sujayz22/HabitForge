@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { createMetricsMiddleware } from '@habitforge/shared';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -10,13 +11,16 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3003;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/habitforge';
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Add metrics middleware
+app.use(createMetricsMiddleware('club-service') as any);
 
 // MongoDB connection
 mongoose.connect(MONGODB_URI)
