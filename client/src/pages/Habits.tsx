@@ -124,7 +124,7 @@ interface WrapperProps {
     navigate: ReturnType<typeof useNavigate>
 }
 
-/** Shows '🏆 Club Challenges' heading only when at least one club has habits */
+/** Shows 'Club Challenges' heading only when at least one club has habits */
 function ClubChallengesWrapper({ clubs, completingClubHabitId, loggedClubHabitIds, onLogClubHabit, navigate }: WrapperProps) {
     const [habitCounts, setHabitCounts] = useState<Record<string, number>>({})
     const totalHabits = Object.values(habitCounts).reduce((s, n) => s + n, 0)
