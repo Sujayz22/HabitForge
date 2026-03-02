@@ -16,7 +16,12 @@ const MONGODB_URI = process.env.MONGODB_URI as string;
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+// Parse CLIENT_URL into an array if multiple origins are provided via comma separation
+const allowedOrigins = process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+    : '*';
+
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
