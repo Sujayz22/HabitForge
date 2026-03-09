@@ -4,6 +4,10 @@ Adaptive habit-tracking platform with gamification &amp; social accountability
 
 > **A complete habit-tracking system designed for Gen Z with personalized gamification and social accountability**
 
+
+## Documentation
+- [Architecture & Design Tradeoffs](docs/ARCHITECTURE.md)
+
 ##  Project Overview
 
 HabitForge is an adaptive habit-tracking platform featuring three distinct behavioral modes with personalized gamification and social accountability systems tailored for Gen Z users.

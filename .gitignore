@@ -22,3 +22,5 @@ coverage/
 !*/README.md
 *.sh
 docker-compose.local.yml
+
+!docs/**/*.md
