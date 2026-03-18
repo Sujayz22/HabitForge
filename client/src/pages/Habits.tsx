@@ -232,7 +232,7 @@ export function Habits() {
                 (old || []).map((h: any) => h._id === id ? { ...h, currentStreak: (h.currentStreak || 0) + 1 } : h)
             )
             setCompletingId(null)
-            toast.xp(0, "Habit logged! 🔥")
+            toast.success("Habit logged! 🔥")
             return { prevLogs, prevHabits }
         },
         onSuccess: (data: any) => {
@@ -258,7 +258,7 @@ export function Habits() {
         onMutate: async ({ habitId, habitName }) => {
             markClubHabitLogged(habitId)
             setCompletingClubHabitId(null)
-            toast.xp(0, `${habitName} logged! 🏆`)
+            toast.success(`${habitName} logged! 🏆`)
             return { habitId }
         },
         onSuccess: (data: any, { habitName }) => {

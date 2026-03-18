@@ -215,7 +215,7 @@ export function Tasks() {
             qc.setQueryData(["tasks"], (old: any[] | undefined) =>
                 (old || []).map((t: any) => t._id === taskId ? { ...t, isCompleted: true, completedAt: new Date().toISOString() } : t)
             )
-            toast.xp(0, "Task completed!")
+            toast.success("Task completed!")
             notify("Task completed! ⚡", "XP incoming...")
             confetti()
             return { prevTasks }

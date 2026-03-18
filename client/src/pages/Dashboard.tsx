@@ -202,7 +202,7 @@ export function Dashboard() {
             )
             // Show toast and confetti immediately
             const habitName = habits.find((h: any) => h._id === id)?.name
-            toast.xp(0, habitName ? `${habitName} logged! 🔥` : "Habit logged! Keep the streak going 🔥")
+            toast.success(habitName ? `${habitName} logged! 🔥` : "Habit logged! Keep the streak going 🔥")
             confetti()
             setCompletingHabitId(null)
             return { prevLogs, prevHabits }
@@ -236,7 +236,7 @@ export function Dashboard() {
             // Optimistically mark as logged immediately
             markClubHabitLogged(habitId)
             setCompletingClubHabitId(null)
-            toast.xp(0, `${habitName} logged! 🏆`)
+            toast.success(`${habitName} logged! 🏆`)
             confetti()
             return { habitId }
         },
@@ -271,7 +271,7 @@ export function Dashboard() {
                 (old || []).map((t: any) => t._id === id ? { ...t, isCompleted: true, completedAt: new Date().toISOString() } : t)
             )
             setCompletingTaskId(null)
-            toast.xp(0, "Task completed! 🎯")
+            toast.success("Task completed! 🎯")
             confetti()
             return { prevTasks }
         },
