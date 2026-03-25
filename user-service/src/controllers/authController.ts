@@ -198,13 +198,15 @@ export async function updateUserXP(req: Request, res: Response, next: NextFuncti
     try {
         const { userId } = req.params;
         const { xpToAdd } = req.body;
-        if (!xpToAdd || xpToAdd < 0) {
-            return res.status(400).json({ success: false, message: 'Invalid XP value' });
+        // Allow positive (rewards) and negative (penalties) XP changes; reject only missing/zero/NaN
+        if (xpToAdd === undefined || xpToAdd === null || !isFinite(xpToAdd) || xpToAdd === 0) {
+            return res.status(400).json({ success: false, message: 'Invalid XP value: must be a non-zero finite number' });
         }
         const user = await authService.getUserById(userId);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-        const newTotalXP = user.xp + xpToAdd;
-        const newLevel = Math.floor(Math.sqrt(newTotalXP / 100));
+        // Ensure XP never drops below 0
+        const newTotalXP = Math.max(0, user.xp + xpToAdd);
+        const newLevel = Math.max(1, Math.floor(Math.sqrt(newTotalXP / 100)));
         const updatedUser = await authService.updateUserXP(userId, xpToAdd, newLevel);
         res.status(200).json({
             success: true,

@@ -49,7 +49,7 @@ function calculateStreakDecay(currentStreak: number, daysMissed: number): number
  */
 async function tryAwardGraceCard(userId: string, type: 'silver' | 'gold'): Promise<void> {
     try {
-        await axios.post(`${USER_SERVICE_URL}/users/${userId}/award-grace-card`, { type });
+        await axios.post(`${USER_SERVICE_URL}/api/users/${userId}/award-grace-card`, { type });
     } catch (error) {
         console.error(`Failed to award ${type} grace card:`, error);
     }
@@ -132,7 +132,7 @@ export async function logHabitCompletion(
         // Mark task as completed
         await Habit.findByIdAndUpdate(habitId, { isTaskCompleted: true });
         // Update user XP
-        try { await axios.put(`${USER_SERVICE_URL}/users/${userId}/xp`, { xpToAdd: taskXp }); } catch (e) { }
+        try { await axios.put(`${USER_SERVICE_URL}/api/users/${userId}/xp`, { xpToAdd: taskXp }); } catch (e) { }
         return { log, xpEarned: taskXp };
     }
 
@@ -182,7 +182,7 @@ export async function logHabitCompletion(
 
     // Update user XP (call user service)
     try {
-        await axios.put(`${USER_SERVICE_URL}/users/${userId}/xp`, { xpToAdd: xpEarned });
+        await axios.put(`${USER_SERVICE_URL}/api/users/${userId}/xp`, { xpToAdd: xpEarned });
     } catch (error) {
         console.error('Failed to update user XP:', error);
     }

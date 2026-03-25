@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Redis from 'ioredis';
 import authRoutes from './routes/authRoutes';
+import internalRoutes from './routes/internalRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -33,6 +34,7 @@ app.use(createMetricsMiddleware('user-service') as any);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authRoutes); // For profile endpoints
+app.use('/api/internal', internalRoutes); // Internal service-to-service calls (no auth)
 
 // Health check
 app.get('/health', async (req: Request, res: Response) => {
