@@ -23,10 +23,8 @@ export async function useSilverGraceCard(
     targetDate?: Date
 ): Promise<GraceCardUsageResult> {
     try {
-        // Check if user has silver cards
-        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/users/profile`, {
-            headers: { 'user-id': userId }
-        });
+        // Check if user has silver cards (internal call — no JWT needed)
+        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/internal/users/${userId}`);
         const user = userResponse.data.data;
         
         if (!user.graceSilverCards || user.graceSilverCards <= 0) {
@@ -95,7 +93,7 @@ export async function useSilverGraceCard(
 
         await graceLog.save();
 
-        // Use the grace card
+        // Use the grace card (internal call)
         await axios.put(`${USER_SERVICE_URL}/api/users/${userId}/grace-cards`, {
             silverChange: -1
         });
@@ -126,10 +124,8 @@ export async function useGoldGraceCard(
     targetDate?: Date
 ): Promise<GraceCardUsageResult> {
     try {
-        // Check if user has gold cards
-        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/users/profile`, {
-            headers: { 'user-id': userId }
-        });
+        // Check if user has gold cards (internal call — no JWT needed)
+        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/internal/users/${userId}`);
         const user = userResponse.data.data;
         
         if (!user.graceGoldCards || user.graceGoldCards <= 0) {
@@ -207,7 +203,7 @@ export async function useGoldGraceCard(
         // Save all grace logs
         await HabitLog.insertMany(graceLogs);
 
-        // Use the grace card
+        // Use the grace card (internal call)
         await axios.put(`${USER_SERVICE_URL}/api/users/${userId}/grace-cards`, {
             goldChange: -1
         });
@@ -227,7 +223,7 @@ export async function useGoldGraceCard(
             if (xpRestored > 0) {
                 await axios.put(`${USER_SERVICE_URL}/api/users/${userId}/xp`, {
                     xpToAdd: xpRestored
-                });
+                }); // xpRestored is always positive (gold card restores XP)
             }
         }
 
@@ -255,9 +251,7 @@ export async function useGoldGraceCard(
  */
 export async function getGraceCardStatus(userId: string) {
     try {
-        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/users/profile`, {
-            headers: { 'user-id': userId }
-        });
+        const userResponse = await axios.get(`${USER_SERVICE_URL}/api/internal/users/${userId}`);
         const user = userResponse.data.data;
         
         return {

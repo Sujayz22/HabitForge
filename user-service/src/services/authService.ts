@@ -184,10 +184,15 @@ export async function updateUserXP(
 ): Promise<IUser | null> {
     return User.findByIdAndUpdate(
         userId,
-        {
-            $inc: { xp: xpToAdd },
-            $set: { level: newLevel }
-        },
+        [
+            {
+                $set: {
+                    // Clamp XP at 0 to prevent negative values from penalties
+                    xp: { $max: [0, { $add: ['$xp', xpToAdd] }] },
+                    level: newLevel
+                }
+            }
+        ],
         { new: true }
     );
 }
