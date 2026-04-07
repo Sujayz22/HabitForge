@@ -196,12 +196,12 @@ export function ClubDetail() {
     // ── Loading/Error ──────────────────────────────────
     if (isLoading) return (
         <div className="flex items-center justify-center h-64">
-            <div className="text-sm" style={{ color: "hsl(150 10% 40%)" }}>Loading club...</div>
+            <div className="text-sm" style={{ color: "var(--text-muted)" }}>Loading club...</div>
         </div>
     )
     if (!club) return (
         <div className="flex flex-col items-center justify-center h-64 gap-3">
-            <div className="text-sm" style={{ color: "hsl(150 10% 40%)" }}>Club not found</div>
+            <div className="text-sm" style={{ color: "var(--text-muted)" }}>Club not found</div>
             <button onClick={() => navigate("/clubs")} className="text-sm underline" style={{ color: "var(--green)" }}>← Back to Clubs</button>
         </div>
     )
@@ -220,9 +220,9 @@ export function ClubDetail() {
 
             {/* ── Back ── */}
             <button onClick={() => navigate("/clubs")} className="flex items-center gap-2 text-sm mb-4 w-fit transition-colors"
-                style={{ color: "hsl(150 10% 50%)" }}
+                style={{ color: "var(--text-secondary)" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "var(--green)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "hsl(150 10% 50%)")}>
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--text-secondary)")}>
                 <ArrowLeft className="h-4 w-4" /> Back to Clubs
             </button>
 
@@ -239,7 +239,7 @@ export function ClubDetail() {
 
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>{club.name}</h1>
+                            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>{club.name}</h1>
                             {club.isPublic !== false
                                 ? <Globe className="h-4 w-4" style={{ color: "#13ec6a" }} />
                                 : <Lock className="h-4 w-4" style={{ color: "#f59e0b" }} />}
@@ -248,18 +248,18 @@ export function ClubDetail() {
                             <span className="text-xs px-2 py-0.5 rounded-full font-semibold mb-2 inline-block"
                                 style={{ background: catBg, color: catColor }}>{club.category}</span>
                         )}
-                        {club.description && <p className="text-sm mt-2" style={{ color: "hsl(150 10% 60%)" }}>{club.description}</p>}
+                        {club.description && <p className="text-sm mt-2" style={{ color: "var(--text-tertiary)" }}>{club.description}</p>}
 
                         <div className="flex flex-wrap items-center gap-5 mt-4">
                             <div className="flex items-center gap-1.5">
                                 <Users className="h-4 w-4" style={{ color: "var(--green)" }} />
-                                <span className="text-sm font-bold" style={{ color: "hsl(150 10% 85%)" }}>{club.memberCount || 0}</span>
-                                <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>members</span>
+                                <span className="text-sm font-bold" style={{ color: "var(--text-body)" }}>{club.memberCount || 0}</span>
+                                <span className="text-xs" style={{ color: "var(--text-muted)" }}>members</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <BookOpen className="h-4 w-4" style={{ color: "#3b82f6" }} />
-                                <span className="text-sm font-bold" style={{ color: "hsl(150 10% 85%)" }}>{habits.length}</span>
-                                <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>habits</span>
+                                <span className="text-sm font-bold" style={{ color: "var(--text-body)" }}>{habits.length}</span>
+                                <span className="text-xs" style={{ color: "var(--text-muted)" }}>habits</span>
                             </div>
                         </div>
                     </div>
@@ -269,7 +269,7 @@ export function ClubDetail() {
                         {isOwner ? (
                             <>
                                 <div className="px-4 py-2 rounded-lg text-xs font-semibold text-center"
-                                    style={{ background: "hsl(150 15% 12%)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
+                                    style={{ background: "var(--surface-3)", color: "var(--green)", border: "1px solid rgba(19,236,106,0.2)" }}>
                                     <Crown className="h-3.5 w-3.5 inline mr-1" /> Your Club
                                 </div>
                                 <button
@@ -315,13 +315,13 @@ export function ClubDetail() {
 
             {/* ── Tabs ── */}
             <div className="flex gap-1 mb-4 p-1 rounded-xl w-fit"
-                style={{ background: "hsl(150 15% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
+                style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                 {(["overview", "members", "habits"] as Tab[]).map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)}
                         className="px-4 py-2 rounded-lg text-xs font-semibold capitalize transition-all"
                         style={{
                             background: activeTab === tab ? "var(--green-dim)" : "transparent",
-                            color: activeTab === tab ? "var(--green)" : "hsl(150 10% 50%)",
+                            color: activeTab === tab ? "var(--green)" : "var(--text-secondary)",
                         }}>
                         {tab}
                     </button>
@@ -335,14 +335,14 @@ export function ClubDetail() {
                         {/* Leaderboard */}
                         <div className="surface-card p-5">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: "hsl(150 10% 55%)" }}>
+                                <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: "var(--text-tertiary)" }}>
                                     <Trophy className="h-4 w-4" style={{ color: "#f59e0b" }} />
                                     Leaderboard
                                 </h3>
-                                <span className="text-xs" style={{ color: "hsl(150 10% 40%)" }}>by club completions</span>
+                                <span className="text-xs" style={{ color: "var(--text-muted)" }}>by club completions</span>
                             </div>
                             {leaderboard.length === 0 ? (
-                                <div className="text-xs py-4 text-center" style={{ color: "hsl(150 10% 40%)" }}>No completions yet — be the first! 🚀</div>
+                                <div className="text-xs py-4 text-center" style={{ color: "var(--text-muted)" }}>No completions yet — be the first! 🚀</div>
                             ) : (
                                 <div className="flex flex-col gap-2">
                                     {leaderboard.slice(0, 5).map((entry) => {
@@ -353,21 +353,21 @@ export function ClubDetail() {
                                         const barWidth = Math.round((entry.completions / maxCompletions) * 100)
                                         return (
                                             <div key={entry.userId} className="flex items-center gap-3 p-3 rounded-xl"
-                                                style={{ background: "hsl(150 15% 10%)", border: isPodium ? `1px solid ${podiumColor}22` : "1px solid transparent" }}>
+                                                style={{ background: "var(--surface-2)", border: isPodium ? `1px solid ${podiumColor}22` : "1px solid transparent" }}>
                                                 <div className="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-extrabold flex-shrink-0"
-                                                    style={{ background: isPodium ? `${podiumColor}22` : "hsl(150 15% 14%)", color: isPodium ? podiumColor : "hsl(150 10% 40%)" }}>
+                                                    style={{ background: isPodium ? `${podiumColor}22` : "hsl(var(--border))", color: isPodium ? podiumColor : "var(--text-muted)" }}>
                                                     {isPodium ? ["🥇", "🥈", "🥉"][entry.rank - 1] : entry.rank}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 88%)" }}>{entry.username}</span>
-                                                        <span className="text-xs font-bold ml-2 flex-shrink-0" style={{ color: isPodium ? podiumColor : "hsl(150 10% 55%)" }}>
+                                                        <span className="text-sm font-semibold truncate" style={{ color: "var(--text-heading)" }}>{entry.username}</span>
+                                                        <span className="text-xs font-bold ml-2 flex-shrink-0" style={{ color: isPodium ? podiumColor : "var(--text-tertiary)" }}>
                                                             {entry.completions} ✓
                                                         </span>
                                                     </div>
-                                                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(150 15% 14%)" }}>
+                                                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(var(--border))" }}>
                                                         <div className="h-full rounded-full transition-all"
-                                                            style={{ width: `${barWidth}%`, background: isPodium ? podiumColor : "hsl(150 30% 35%)" }} />
+                                                            style={{ width: `${barWidth}%`, background: isPodium ? podiumColor : "var(--green)" }} />
                                                     </div>
                                                 </div>
                                             </div>
@@ -380,11 +380,11 @@ export function ClubDetail() {
                         {/* Club Habits preview */}
                         <div className="surface-card p-5">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>📋 Club Habits</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>📋 Club Habits</h3>
                                 <button onClick={() => setActiveTab("habits")} className="text-xs" style={{ color: "var(--green)" }}>See all →</button>
                             </div>
                             {habits.length === 0 ? (
-                                <div className="text-xs py-2" style={{ color: "hsl(150 10% 40%)" }}>No habits yet.</div>
+                                <div className="text-xs py-2" style={{ color: "var(--text-muted)" }}>No habits yet.</div>
                             ) : (
                                 <div className="flex flex-col gap-2">
                                     {habits.slice(0, 3).map(habit => {
@@ -396,8 +396,8 @@ export function ClubDetail() {
                                                     <Target className="h-4 w-4" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 88%)" }}>{habit.name}</div>
-                                                    <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.frequency} · {DIFFICULTY_LABELS[habit.difficulty || 1]}</div>
+                                                    <div className="text-sm font-semibold truncate" style={{ color: "var(--text-heading)" }}>{habit.name}</div>
+                                                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>{habit.frequency} · {DIFFICULTY_LABELS[habit.difficulty || 1]}</div>
                                                 </div>
                                             </div>
                                         )
@@ -410,41 +410,41 @@ export function ClubDetail() {
                     {/* Right sidebar */}
                     <div className="flex flex-col gap-4">
                         <div className="surface-card p-5">
-                            <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 55%)" }}>Club Stats</h3>
+                            <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-tertiary)" }}>Club Stats</h3>
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <div className="text-xs mb-1" style={{ color: "hsl(150 10% 45%)" }}>Members</div>
+                                    <div className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Members</div>
                                     <div className="text-3xl font-extrabold" style={{ color: "var(--green)" }}>{club.memberCount || 0}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs mb-1" style={{ color: "hsl(150 10% 45%)" }}>Active Habits</div>
+                                    <div className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Active Habits</div>
                                     <div className="text-3xl font-extrabold" style={{ color: "#3b82f6" }}>{habits.length}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs mb-1" style={{ color: "hsl(150 10% 45%)" }}>Club Type</div>
+                                    <div className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Club Type</div>
                                     <div className="flex items-center gap-1.5 mt-1">
                                         {club.isPublic !== false
-                                            ? <><Globe className="h-4 w-4" style={{ color: "#13ec6a" }} /><span className="text-sm font-semibold" style={{ color: "hsl(150 10% 80%)" }}>Public</span></>
-                                            : <><Lock className="h-4 w-4" style={{ color: "#f59e0b" }} /><span className="text-sm font-semibold" style={{ color: "hsl(150 10% 80%)" }}>Private</span></>}
+                                            ? <><Globe className="h-4 w-4" style={{ color: "#13ec6a" }} /><span className="text-sm font-semibold" style={{ color: "var(--btn-secondary-text)" }}>Public</span></>
+                                            : <><Lock className="h-4 w-4" style={{ color: "#f59e0b" }} /><span className="text-sm font-semibold" style={{ color: "var(--btn-secondary-text)" }}>Private</span></>}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="surface-card p-5">
-                            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: "hsl(150 10% 55%)" }}>My Status</h3>
+                            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: "var(--text-tertiary)" }}>My Status</h3>
                             {isMember ? (
                                 <div className="flex flex-col gap-2">
                                     <div className="flex items-center gap-2">
                                         <CheckCircle2 className="h-4 w-4" style={{ color: "var(--green)" }} />
                                         <span className="text-sm font-semibold" style={{ color: "var(--green)" }}>Member</span>
                                     </div>
-                                    <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>
-                                        Role: <span className="font-semibold" style={{ color: "hsl(150 10% 75%)" }}>{myMembership?.role || "MEMBER"}</span>
+                                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                        Role: <span className="font-semibold" style={{ color: "var(--text-label)" }}>{myMembership?.role || "MEMBER"}</span>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-3">
-                                    <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>You are not a member yet.</div>
+                                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>You are not a member yet.</div>
                                     {club.isPublic !== false && (
                                         <button onClick={() => joinMutation.mutate()} disabled={joinMutation.isPending}
                                             className="w-full py-2 rounded-lg text-xs font-semibold disabled:opacity-50"
@@ -462,9 +462,9 @@ export function ClubDetail() {
             {/* ── MEMBERS TAB ── */}
             {activeTab === "members" && (
                 <div className="surface-card p-5">
-                    <h3 className="text-sm font-bold uppercase tracking-wider mb-5" style={{ color: "hsl(150 10% 55%)" }}>All Members ({members.length})</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-tertiary)" }}>All Members ({members.length})</h3>
                     {sortedMembers.length === 0 ? (
-                        <div className="text-sm py-8 text-center" style={{ color: "hsl(150 10% 40%)" }}>No members yet</div>
+                        <div className="text-sm py-8 text-center" style={{ color: "var(--text-muted)" }}>No members yet</div>
                     ) : (
                         <div className="flex flex-col gap-2">
                             {sortedMembers.map((member, idx) => {
@@ -473,29 +473,29 @@ export function ClubDetail() {
                                 const pc = ["#f59e0b", "#94a3b8", "#b45309"]
                                 return (
                                     <div key={member._id} className="flex items-center gap-4 p-4 rounded-xl"
-                                        style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 12% 14%)" }}>
+                                        style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                                         <div className="w-8 h-8 flex items-center justify-center rounded-lg text-sm font-extrabold flex-shrink-0"
-                                            style={{ background: isPodium ? `${pc[idx]}22` : "hsl(150 15% 14%)", color: isPodium ? pc[idx] : "hsl(150 10% 40%)" }}>
+                                            style={{ background: isPodium ? `${pc[idx]}22` : "hsl(var(--border))", color: isPodium ? pc[idx] : "var(--text-muted)" }}>
                                             {isPodium ? ["🥇", "🥈", "🥉"][idx] : idx + 1}
                                         </div>
                                         <div className="h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
-                                            style={{ background: "hsl(150 15% 15%)", color: "var(--green)" }}>
+                                            style={{ background: "hsl(var(--border))", color: "var(--green)" }}>
                                             {member.username.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-1.5">
-                                                <span className="text-sm font-semibold" style={{ color: "hsl(150 10% 88%)" }}>{member.username}</span>
+                                                <span className="text-sm font-semibold" style={{ color: "var(--text-heading)" }}>{member.username}</span>
                                                 <RoleIcon className="h-3.5 w-3.5"
-                                                    style={{ color: member.role === "OWNER" ? "#f59e0b" : member.role === "ADMIN" ? "#8b5cf6" : "hsl(150 10% 35%)" }} />
+                                                    style={{ color: member.role === "OWNER" ? "#f59e0b" : member.role === "ADMIN" ? "#8b5cf6" : "var(--text-muted)" }} />
                                             </div>
-                                            <span className="text-xs capitalize" style={{ color: "hsl(150 10% 40%)" }}>{member.role?.toLowerCase()}</span>
+                                            <span className="text-xs capitalize" style={{ color: "var(--text-muted)" }}>{member.role?.toLowerCase()}</span>
                                         </div>
                                         {member.currentStreak !== undefined && (
                                             <div className="text-center">
                                                 <div className="flex items-center gap-1 text-sm font-bold" style={{ color: "#f97316" }}>
                                                     <Flame className="h-3.5 w-3.5" /> {member.currentStreak}
                                                 </div>
-                                                <div className="text-xs" style={{ color: "hsl(150 10% 40%)" }}>streak</div>
+                                                <div className="text-xs" style={{ color: "var(--text-muted)" }}>streak</div>
                                             </div>
                                         )}
                                     </div>
@@ -510,7 +510,7 @@ export function ClubDetail() {
             {activeTab === "habits" && (
                 <div className="surface-card p-5">
                     <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>Club Habits ({habits.length})</h3>
+                        <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>Club Habits ({habits.length})</h3>
                         {/* Only owners can add habits */}
                         {isOwner && (
                             <button onClick={() => setShowAddHabit(true)}
@@ -523,9 +523,9 @@ export function ClubDetail() {
 
                     {habits.length === 0 ? (
                         <div className="text-center py-12">
-                            <Target className="h-10 w-10 mx-auto mb-3" style={{ color: "hsl(150 15% 20%)" }} />
-                            <div className="text-sm mb-1" style={{ color: "hsl(150 10% 45%)" }}>No habits added yet</div>
-                            {isOwner && <div className="text-xs" style={{ color: "hsl(150 10% 35%)" }}>Click "Add Habit" to create club challenges for members</div>}
+                            <Target className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--input-border)" }} />
+                            <div className="text-sm mb-1" style={{ color: "var(--text-muted)" }}>No habits added yet</div>
+                            {isOwner && <div className="text-xs" style={{ color: "var(--text-muted)" }}>Click "Add Habit" to create club challenges for members</div>}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -534,16 +534,16 @@ export function ClubDetail() {
                                 const freqColor = FREQ_COLORS[habit.frequency || "DAILY"] || "#13ec6a"
                                 return (
                                     <div key={habit._id} className="p-4 rounded-xl flex flex-col gap-3"
-                                        style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 12% 14%)" }}>
+                                        style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                                         <div className="flex items-start gap-3">
                                             <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
                                                 style={{ background: `${hColor}18`, color: hColor }}>
                                                 <Target className="h-5 w-5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="font-bold text-sm" style={{ color: "hsl(150 10% 88%)" }}>{habit.name}</div>
+                                                <div className="font-bold text-sm" style={{ color: "var(--text-heading)" }}>{habit.name}</div>
                                                 {habit.description && (
-                                                    <div className="text-xs mt-0.5 line-clamp-2" style={{ color: "hsl(150 10% 48%)" }}>{habit.description}</div>
+                                                    <div className="text-xs mt-0.5 line-clamp-2" style={{ color: "var(--text-muted)" }}>{habit.description}</div>
                                                 )}
                                             </div>
                                             {/* Owner: delete button */}
@@ -569,7 +569,7 @@ export function ClubDetail() {
                                                 </span>
                                                 {habit.difficulty && (
                                                     <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                                        style={{ background: "hsl(150 15% 14%)", color: "hsl(150 10% 50%)" }}>
+                                                        style={{ background: "hsl(var(--border))", color: "var(--text-secondary)" }}>
                                                         {DIFFICULTY_LABELS[habit.difficulty]}
                                                     </span>
                                                 )}
@@ -614,42 +614,42 @@ export function ClubDetail() {
             {showAddHabit && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
                     <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-4 relative"
-                        style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 16%)" }}>
+                        style={{ background: "var(--surface)", border: "1px solid var(--input-border)" }}>
                         <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-base" style={{ color: "hsl(150 10% 92%)" }}>Add Club Habit</h3>
+                            <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>Add Club Habit</h3>
                             <button onClick={() => { setShowAddHabit(false); setHabitForm(emptyHabitForm) }}
-                                className="p-1.5 rounded-lg" style={{ color: "hsl(150 10% 50%)" }}>
+                                className="p-1.5 rounded-lg" style={{ color: "var(--text-secondary)" }}>
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
 
                         <div className="flex flex-col gap-3">
                             <div>
-                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Habit Name *</label>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Habit Name *</label>
                                 <input value={habitForm.name} onChange={e => setHabitForm(f => ({ ...f, name: e.target.value }))}
                                     placeholder="e.g. Run 5km" className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                    style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }} />
+                                    style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }} />
                             </div>
                             <div>
-                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Description</label>
                                 <textarea value={habitForm.description} onChange={e => setHabitForm(f => ({ ...f, description: e.target.value }))}
                                     placeholder="Optional description" rows={2} className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-                                    style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }} />
+                                    style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }} />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Category</label>
+                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Category</label>
                                     <select value={habitForm.category} onChange={e => setHabitForm(f => ({ ...f, category: e.target.value }))}
                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                        style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}>
+                                        style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}>
                                         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Frequency</label>
+                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Frequency</label>
                                     <select value={habitForm.frequency} onChange={e => setHabitForm(f => ({ ...f, frequency: e.target.value, customDays: [] }))}
                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                        style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}>
+                                        style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}>
                                         {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                                     </select>
                                 </div>
@@ -657,7 +657,7 @@ export function ClubDetail() {
                             {/* Day picker for CUSTOM frequency */}
                             {habitForm.frequency === "CUSTOM" && (
                                 <div>
-                                    <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Select Days *</label>
+                                    <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-tertiary)" }}>Select Days *</label>
                                     <div className="flex gap-1.5 flex-wrap">
                                         {DAY_LABELS.map((label, idx) => {
                                             const selected = habitForm.customDays.includes(idx)
@@ -671,9 +671,9 @@ export function ClubDetail() {
                                                     }))}
                                                     className="w-9 h-9 rounded-lg text-xs font-bold transition-all"
                                                     style={{
-                                                        background: selected ? "rgba(139,92,246,0.2)" : "hsl(150 15% 12%)",
-                                                        border: `1px solid ${selected ? "#8b5cf6" : "hsl(150 15% 18%)"}`,
-                                                        color: selected ? "#8b5cf6" : "hsl(150 10% 50%)"
+                                                        background: selected ? "rgba(139,92,246,0.2)" : "var(--surface-3)",
+                                                        border: `1px solid ${selected ? "#8b5cf6" : "var(--input-border)"}`,
+                                                        color: selected ? "#8b5cf6" : "var(--text-secondary)"
                                                     }}>
                                                     {label}
                                                 </button>
@@ -686,16 +686,16 @@ export function ClubDetail() {
                                 </div>
                             )}
                             <div>
-                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Difficulty</label>
                                 <div className="flex gap-2">
                                     {DIFFICULTIES.map(d => (
                                         <button key={d.value} type="button"
                                             onClick={() => setHabitForm(f => ({ ...f, difficulty: d.value }))}
                                             className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
                                             style={{
-                                                background: habitForm.difficulty === d.value ? "var(--green-dim)" : "hsl(150 15% 12%)",
-                                                color: habitForm.difficulty === d.value ? "var(--green)" : "hsl(150 10% 50%)",
-                                                border: habitForm.difficulty === d.value ? "1px solid rgba(19,236,106,0.3)" : "1px solid hsl(150 15% 18%)"
+                                                background: habitForm.difficulty === d.value ? "var(--green-dim)" : "var(--surface-3)",
+                                                color: habitForm.difficulty === d.value ? "var(--green)" : "var(--text-secondary)",
+                                                border: habitForm.difficulty === d.value ? "1px solid rgba(19,236,106,0.3)" : "1px solid var(--input-border)"
                                             }}>
                                             {d.label}
                                         </button>
@@ -717,7 +717,7 @@ export function ClubDetail() {
                             </button>
                             <button onClick={() => { setShowAddHabit(false); setHabitForm(emptyHabitForm) }}
                                 className="px-4 py-2.5 rounded-xl text-sm font-semibold"
-                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 60%)" }}>
+                                style={{ background: "var(--surface-3)", color: "var(--text-tertiary)" }}>
                                 Cancel
                             </button>
                         </div>
@@ -729,8 +729,8 @@ export function ClubDetail() {
             {showInviteCode && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
                     <div className="w-full max-w-sm rounded-2xl p-6 flex flex-col gap-4 items-center text-center relative"
-                        style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 16%)" }}>
-                        <button onClick={() => setShowInviteCode(false)} className="absolute top-4 right-4 p-1.5 rounded-lg" style={{ color: "hsl(150 10% 50%)" }}>
+                        style={{ background: "var(--surface)", border: "1px solid var(--input-border)" }}>
+                        <button onClick={() => setShowInviteCode(false)} className="absolute top-4 right-4 p-1.5 rounded-lg" style={{ color: "var(--text-secondary)" }}>
                             <X className="h-4 w-4" />
                         </button>
                         <div className="h-12 w-12 rounded-2xl flex items-center justify-center"
@@ -738,14 +738,14 @@ export function ClubDetail() {
                             <Key className="h-6 w-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-base mb-1" style={{ color: "hsl(150 10% 92%)" }}>Invite Code</h3>
-                            <p className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>Share this code with people you want to invite to <strong>{club.name}</strong></p>
+                            <h3 className="font-bold text-base mb-1" style={{ color: "var(--text-primary)" }}>Invite Code</h3>
+                            <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Share this code with people you want to invite to <strong>{club.name}</strong></p>
                         </div>
                         <div className="flex items-center gap-3 px-5 py-3 rounded-xl w-full justify-between"
-                            style={{ background: "hsl(150 15% 11%)", border: "1px solid rgba(245,158,11,0.25)" }}>
+                            style={{ background: "var(--divider)", border: "1px solid rgba(245,158,11,0.25)" }}>
                             <span className="text-xl font-extrabold tracking-widest" style={{ color: "#f59e0b" }}>{inviteCodeValue}</span>
                             <button onClick={copyCode} className="p-1.5 rounded-lg transition-all"
-                                style={{ color: codeCopied ? "var(--green)" : "hsl(150 10% 50%)" }}>
+                                style={{ color: codeCopied ? "var(--green)" : "var(--text-secondary)" }}>
                                 {codeCopied ? <CheckCircle2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                             </button>
                         </div>
@@ -760,32 +760,32 @@ export function ClubDetail() {
             {/* ── Edit Club Modal ── */}
             {showEditClub && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
-                    <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-4" style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 16%)" }}>
+                    <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-4" style={{ background: "var(--surface)", border: "1px solid var(--input-border)" }}>
                         <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-base flex items-center gap-2" style={{ color: "hsl(150 10% 92%)" }}>
+                            <h3 className="font-bold text-base flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
                                 <Pencil className="h-4 w-4" style={{ color: "#60a5fa" }} /> Edit Club
                             </h3>
-                            <button onClick={() => setShowEditClub(false)} className="p-1.5 rounded-lg" style={{ color: "hsl(150 10% 50%)" }}>
+                            <button onClick={() => setShowEditClub(false)} className="p-1.5 rounded-lg" style={{ color: "var(--text-secondary)" }}>
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
 
                         {/* Name */}
                         <div>
-                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Club Name *</label>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Club Name *</label>
                             <input
                                 value={editName}
                                 onChange={e => setEditName(e.target.value)}
                                 maxLength={50}
                                 placeholder="Club name (3–50 chars)"
                                 className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Description</label>
                             <textarea
                                 value={editDesc}
                                 onChange={e => setEditDesc(e.target.value)}
@@ -793,23 +793,23 @@ export function ClubDetail() {
                                 maxLength={500}
                                 placeholder="What is this club about?"
                                 className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
-                            <div className="text-right text-[10px] mt-0.5 font-mono" style={{ color: "hsl(150 10% 35%)" }}>{editDesc.length}/500</div>
+                            <div className="text-right text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-muted)" }}>{editDesc.length}/500</div>
                         </div>
 
                         {/* Privacy toggle */}
                         <div>
-                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Privacy</label>
+                            <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-tertiary)" }}>Privacy</label>
                             <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setEditIsPublic(true)}
                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
                                     style={{
-                                        background: editIsPublic ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
-                                        color: editIsPublic ? "var(--green)" : "hsl(150 10% 45%)",
-                                        border: `1px solid ${editIsPublic ? "rgba(19,236,106,0.3)" : "hsl(150 15% 18%)"}`,
+                                        background: editIsPublic ? "rgba(19,236,106,0.12)" : "var(--surface-3)",
+                                        color: editIsPublic ? "var(--green)" : "var(--text-muted)",
+                                        border: `1px solid ${editIsPublic ? "rgba(19,236,106,0.3)" : "var(--input-border)"}`,
                                     }}>
                                     <Globe className="h-3.5 w-3.5" /> Public
                                 </button>
@@ -818,15 +818,15 @@ export function ClubDetail() {
                                     onClick={() => setEditIsPublic(false)}
                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all"
                                     style={{
-                                        background: !editIsPublic ? "rgba(245,158,11,0.12)" : "hsl(150 15% 12%)",
-                                        color: !editIsPublic ? "#f59e0b" : "hsl(150 10% 45%)",
-                                        border: `1px solid ${!editIsPublic ? "rgba(245,158,11,0.3)" : "hsl(150 15% 18%)"}`,
+                                        background: !editIsPublic ? "rgba(245,158,11,0.12)" : "var(--surface-3)",
+                                        color: !editIsPublic ? "#f59e0b" : "var(--text-muted)",
+                                        border: `1px solid ${!editIsPublic ? "rgba(245,158,11,0.3)" : "var(--input-border)"}`,
                                     }}>
                                     <Lock className="h-3.5 w-3.5" /> Private
                                 </button>
                             </div>
                             {!editIsPublic && (
-                                <p className="text-[10px] mt-1.5" style={{ color: "hsl(150 10% 40%)" }}>Private clubs require an invite code to join</p>
+                                <p className="text-[10px] mt-1.5" style={{ color: "var(--text-muted)" }}>Private clubs require an invite code to join</p>
                             )}
                         </div>
 
@@ -840,7 +840,7 @@ export function ClubDetail() {
                             </button>
                             <button onClick={() => setShowEditClub(false)}
                                 className="px-4 py-2.5 rounded-xl text-sm font-semibold"
-                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 60%)" }}>
+                                style={{ background: "var(--surface-3)", color: "var(--text-tertiary)" }}>
                                 Cancel
                             </button>
                         </div>
@@ -851,18 +851,18 @@ export function ClubDetail() {
             {/* ── Delete Club Modal ── */}
             {showDeleteClub && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" style={{ animation: "toastIn 0.2s ease" }}>
-                    <div className="w-full max-w-md rounded-2xl p-6" style={{ background: "hsl(150 20% 7%)", border: "1px solid rgba(239,68,68,0.3)" }}>
+                    <div className="w-full max-w-md rounded-2xl p-6" style={{ background: "var(--surface)", border: "1px solid rgba(239,68,68,0.3)" }}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
                                 <AlertTriangle className="h-5 w-5" />
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold" style={{ color: "hsl(150 10% 95%)" }}>Delete Club</h2>
-                                <p className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>{club.name}</p>
+                                <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Delete Club</h2>
+                                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{club.name}</p>
                             </div>
                         </div>
 
-                        <p className="text-sm mb-4" style={{ color: "hsl(150 10% 60%)" }}>
+                        <p className="text-sm mb-4" style={{ color: "var(--text-tertiary)" }}>
                             This action is <strong>irreversible</strong>. It will permanently delete the club,
                             including all habits, members, activity logs, and leaderboard data.
                         </p>
@@ -874,8 +874,8 @@ export function ClubDetail() {
                         )}
 
                         <div className="mb-6">
-                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 70%)" }}>
-                                Type <strong style={{ color: "hsl(150 10% 90%)" }}>DELETE</strong> to confirm
+                            <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-label)" }}>
+                                Type <strong style={{ color: "var(--text-heading)" }}>DELETE</strong> to confirm
                             </label>
                             <input
                                 type="text"
@@ -884,7 +884,7 @@ export function ClubDetail() {
                                 placeholder="DELETE"
                                 autoFocus
                                 className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                style={{ background: "hsl(150 20% 4%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "hsl(var(--background))", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
 
@@ -893,7 +893,7 @@ export function ClubDetail() {
                                 onClick={() => { setShowDeleteClub(false); setDeleteClubInput(""); setDeleteClubError("") }}
                                 disabled={deleteClubMutation.isPending}
                                 className="flex-1 py-2 rounded-lg text-sm font-semibold"
-                                style={{ background: "hsl(150 20% 12%)", color: "hsl(150 10% 70%)", border: "1px solid hsl(150 15% 18%)" }}>
+                                style={{ background: "var(--surface-3)", color: "var(--text-label)", border: "1px solid var(--input-border)" }}>
                                 Cancel
                             </button>
                             <button

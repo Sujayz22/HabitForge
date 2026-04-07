@@ -31,7 +31,7 @@ export function XPChart({ logs, days = 7 }: XPChartProps) {
 
     if (!hasData) {
         return (
-            <div className="flex items-center justify-center h-full min-h-[160px] text-sm" style={{ color: "hsl(150 10% 35%)" }}>
+            <div className="flex items-center justify-center h-full min-h-[160px] text-sm" style={{ color: "var(--text-muted)" }}>
                 Complete habits to see your XP momentum
             </div>
         )
@@ -46,12 +46,12 @@ export function XPChart({ logs, days = 7 }: XPChartProps) {
                         <stop offset="95%" stopColor="#13ec6a" stopOpacity={0} />
                     </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(150 15% 12%)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fill: "hsl(150 10% 40%)", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "hsl(150 10% 40%)", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--surface-3)" vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip
-                    contentStyle={{ background: "hsl(150 20% 8%)", border: "1px solid hsl(150 15% 14%)", borderRadius: 8, color: "hsl(150 10% 90%)" }}
-                    labelStyle={{ color: "hsl(150 10% 60%)", fontSize: 12 }}
+                    contentStyle={{ background: "var(--surface)", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "var(--text-heading)" }}
+                    labelStyle={{ color: "var(--text-tertiary)", fontSize: 12 }}
                     formatter={(val: any) => [`${val} XP`, "XP Earned"]}
                 />
                 <Area type="monotone" dataKey="xp" stroke="#13ec6a" strokeWidth={2} fill="url(#xpGradient)" dot={false} />

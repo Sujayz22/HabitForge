@@ -66,7 +66,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast & { removing?: boolean }
         <div
             className="toast-item"
             style={{
-                background: `hsl(150 20% 7%)`,
+                background: `var(--surface)`,
                 border: `1px solid ${cfg.border}`,
                 borderRadius: "12px",
                 padding: "12px 14px",
@@ -97,11 +97,11 @@ function ToastItem({ toast, onDismiss }: { toast: Toast & { removing?: boolean }
 
             {/* Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "13px", fontWeight: 700, color: "hsl(150 10% 92%)", lineHeight: 1.3 }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>
                     {toast.title}
                 </div>
                 {toast.message && (
-                    <div style={{ fontSize: "12px", color: "hsl(150 10% 55%)", marginTop: "2px", lineHeight: 1.4 }}>
+                    <div style={{ fontSize: "12px", color: "var(--text-tertiary)", marginTop: "2px", lineHeight: 1.4 }}>
                         {toast.message}
                     </div>
                 )}
@@ -110,12 +110,12 @@ function ToastItem({ toast, onDismiss }: { toast: Toast & { removing?: boolean }
             {/* Dismiss */}
             <button onClick={onDismiss} style={{
                 background: "transparent", border: "none", cursor: "pointer",
-                color: "hsl(150 10% 40%)", flexShrink: 0, padding: "2px",
+                color: "var(--text-muted)", flexShrink: 0, padding: "2px",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 borderRadius: "4px", transition: "color 0.15s",
             }}
-                onMouseOver={e => (e.currentTarget.style.color = "hsl(150 10% 70%)")}
-                onMouseOut={e => (e.currentTarget.style.color = "hsl(150 10% 40%)")}
+                onMouseOver={e => (e.currentTarget.style.color = "var(--text-label)")}
+                onMouseOut={e => (e.currentTarget.style.color = "var(--text-muted)")}
             >
                 <X size={14} />
             </button>

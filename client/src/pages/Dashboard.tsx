@@ -53,7 +53,7 @@ function ClubChallengesSection({ clubs, completingId, loggedClubHabitIds, onLogC
             {totalHabits > 0 && (
                 <div className="flex items-center gap-2">
                     <Target className="h-4 w-4" style={{ color: "#f59e0b" }} />
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                         Club Challenges
                     </h2>
                 </div>
@@ -99,7 +99,7 @@ function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogCl
     return (
         <div className="surface-card p-5">
             <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                     🏆 {club.name}
                 </h3>
                 <button onClick={() => navigate(`/clubs/${club._id}`)}
@@ -116,12 +116,12 @@ function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogCl
                     const isDone = isLogged || isCompleting
                     return (
                         <div key={habit._id} className="flex items-center gap-3 py-1.5"
-                            style={{ borderBottom: "1px solid hsl(150 15% 11%)" }}>
+                            style={{ borderBottom: "1px solid var(--divider)" }}>
                             <button
                                 className={`complete-btn ${isDone ? "completed" : ""}`}
                                 disabled={isDone}
                                 onClick={() => { if (!isDone) onLogClubHabit(club._id, habit._id, habit.name) }}>
-                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "var(--save-btn-text)" }} />}
                             </button>
                             <div className="h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0"
                                 style={{ background: hBg, color: hColor }}>
@@ -129,8 +129,8 @@ function ClubHabitsInDashboard({ club, completingId, loggedClubHabitIds, onLogCl
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className={`text-sm font-semibold truncate ${isDone ? "line-through opacity-50" : ""}`}
-                                    style={{ color: "hsl(150 10% 88%)" }}>{habit.name}</div>
-                                <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.category} · {habit.frequency}</div>
+                                    style={{ color: "var(--text-heading)" }}>{habit.name}</div>
+                                <div className="text-xs" style={{ color: "var(--text-muted)" }}>{habit.category} · {habit.frequency}</div>
                             </div>
                         </div>
                     )
@@ -336,10 +336,10 @@ export function Dashboard() {
             {/* Header */}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>
                         Command Center
                     </h1>
-                    <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                         {dateStr}
                         {topStreak > 0 && (
                             <span className="ml-3 inline-flex items-center gap-1 font-semibold" style={{ color: "var(--green)" }}>
@@ -372,7 +372,7 @@ export function Dashboard() {
                         </div>
                         <div>
                             <div className="text-2xl font-extrabold" style={{ color: s.color }}>{s.value}</div>
-                            <div className="text-xs font-medium" style={{ color: "hsl(150 10% 50%)" }}>{s.label}</div>
+                            <div className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>{s.label}</div>
                         </div>
                     </div>
                 ))}
@@ -384,7 +384,7 @@ export function Dashboard() {
                 <div className="lg:col-span-1 surface-card p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <Target className="h-4 w-4" style={{ color: "var(--green)" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                             Today's Habits
                         </h2>
                         <span className="ml-auto badge-green">
@@ -394,7 +394,7 @@ export function Dashboard() {
 
                     <div className="flex flex-col gap-2">
                         {todayHabits.length === 0 ? (
-                            <div className="text-center py-6 text-sm" style={{ color: "hsl(150 10% 40%)" }}>
+                            <div className="text-center py-6 text-sm" style={{ color: "var(--text-muted)" }}>
                                 No habits yet.{" "}
                                 <button onClick={() => navigate("/habits")} className="underline" style={{ color: "var(--green)" }}>
                                     Create one →
@@ -406,7 +406,7 @@ export function Dashboard() {
                                 const isLoading = completingHabitId === habit._id
                                 return (
                                     <div key={habit._id} className="flex items-center gap-3 py-2"
-                                        style={{ borderBottom: "1px solid hsl(150 15% 11%)" }}>
+                                        style={{ borderBottom: "1px solid var(--divider)" }}>
                                         <button
                                             className={`complete-btn ${done ? "completed" : ""}`}
                                             disabled={done || isLoading}
@@ -416,14 +416,14 @@ export function Dashboard() {
                                                     logHabitMutation.mutate(habit._id)
                                                 }
                                             }}>
-                                            {done && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                                            {done && <CheckCircle2 className="h-4 w-4" style={{ color: "var(--save-btn-text)" }} />}
                                         </button>
                                         <div className="flex-1 min-w-0">
                                             <div className={`text-sm font-semibold truncate ${done ? "line-through opacity-50" : ""}`}
-                                                style={{ color: "hsl(150 10% 88%)" }}>
+                                                style={{ color: "var(--text-heading)" }}>
                                                 {habit.name}
                                             </div>
-                                            <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>
+                                            <div className="text-xs" style={{ color: "var(--text-muted)" }}>
                                                 {habit.category}
                                             </div>
                                         </div>
@@ -445,7 +445,7 @@ export function Dashboard() {
                 <div className="lg:col-span-2 surface-card p-5 flex flex-col">
                     <div className="flex items-center gap-2 mb-4">
                         <Zap className="h-4 w-4" style={{ color: "var(--green)" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                             XP Momentum
                         </h2>
                     </div>
@@ -475,7 +475,7 @@ export function Dashboard() {
                 <div className="surface-card p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <ListTodo className="h-4 w-4" style={{ color: "#3b82f6" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                             Active Tasks
                         </h2>
                         <button onClick={() => navigate("/tasks")} className="ml-auto flex items-center gap-1 text-xs"
@@ -486,7 +486,7 @@ export function Dashboard() {
 
                     {pendingTasks.length === 0 ? (
                         <div className="text-center py-8 flex flex-col items-center gap-2 text-sm"
-                            style={{ color: "hsl(150 10% 40%)" }}>
+                            style={{ color: "var(--text-muted)" }}>
                             <ListTodo className="h-7 w-7 opacity-30" />
                             No tasks pending •{" "}
                             <button onClick={() => navigate("/tasks")} style={{ color: "#3b82f6" }} className="underline">
@@ -497,7 +497,7 @@ export function Dashboard() {
                         <div className="space-y-2">
                             {pendingTasks.slice(0, 6).map((task: Task) => (
                                 <div key={task._id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl"
-                                    style={{ background: "hsl(150 20% 9%)", border: "1px solid hsl(150 15% 12%)" }}>
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--divider)" }}>
                                     {/* Inline complete button */}
                                     <button
                                         onClick={() => {
@@ -511,7 +511,7 @@ export function Dashboard() {
                                         style={{ borderColor: "#13ec6a" }}
                                         title="Mark complete"
                                     />
-                                    <div className="flex-1 text-sm truncate" style={{ color: "hsl(150 10% 85%)" }}>
+                                    <div className="flex-1 text-sm truncate" style={{ color: "var(--text-body)" }}>
                                         {task.title}
                                     </div>
                                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
@@ -534,44 +534,44 @@ export function Dashboard() {
                 <div className="surface-card p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <ShieldCheck className="h-4 w-4" style={{ color: "#f59e0b" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                             Grace Cards
                         </h2>
-                        <span className="ml-auto text-xs" style={{ color: "hsl(150 10% 40%)" }}>Earned via streaks</span>
+                        <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>Earned via streaks</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         {/* Silver */}
-                        <div className="rounded-xl p-4" style={{ background: "hsl(150 20% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
+                        <div className="rounded-xl p-4" style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                             <div className="flex items-center justify-between mb-1">
                                 <span className="text-xs font-bold" style={{ color: "#c0c0c0" }}>Silver</span>
                                 <span className="text-xl font-extrabold" style={{ color: "#c0c0c0" }}>{graceSilver}</span>
                             </div>
-                            <p className="text-[11px] mb-3" style={{ color: "hsl(150 10% 40%)" }}>Forgives 1 habit • 7d streak</p>
+                            <p className="text-[11px] mb-3" style={{ color: "var(--text-muted)" }}>Forgives 1 habit • 7d streak</p>
                             <button onClick={() => useGraceCardMutation.mutate("silver")}
                                 disabled={graceSilver === 0 || useGraceCardMutation.isPending}
                                 className="w-full py-1.5 rounded-lg text-xs font-bold"
                                 style={{
-                                    background: graceSilver > 0 ? "rgba(192,192,192,0.15)" : "hsl(150 20% 10%)",
-                                    border: `1px solid ${graceSilver > 0 ? "rgba(192,192,192,0.3)" : "hsl(150 15% 13%)"}`,
-                                    color: graceSilver > 0 ? "#c0c0c0" : "hsl(150 10% 35%)",
+                                    background: graceSilver > 0 ? "rgba(192,192,192,0.15)" : "var(--surface-2)",
+                                    border: `1px solid ${graceSilver > 0 ? "rgba(192,192,192,0.3)" : "var(--divider)"}`,
+                                    color: graceSilver > 0 ? "#c0c0c0" : "var(--text-muted)",
                                 }}>
                                 {graceSilver > 0 ? "Use Silver Card" : "None available"}
                             </button>
                         </div>
                         {/* Gold */}
-                        <div className="rounded-xl p-4" style={{ background: "hsl(150 20% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
+                        <div className="rounded-xl p-4" style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                             <div className="flex items-center justify-between mb-1">
                                 <span className="text-xs font-bold" style={{ color: "#f59e0b" }}>Gold</span>
                                 <span className="text-xl font-extrabold" style={{ color: "#f59e0b" }}>{graceGold}</span>
                             </div>
-                            <p className="text-[11px] mb-3" style={{ color: "hsl(150 10% 40%)" }}>Forgives full day • 15d streak</p>
+                            <p className="text-[11px] mb-3" style={{ color: "var(--text-muted)" }}>Forgives full day • 15d streak</p>
                             <button onClick={() => useGraceCardMutation.mutate("gold")}
                                 disabled={graceGold === 0 || useGraceCardMutation.isPending}
                                 className="w-full py-1.5 rounded-lg text-xs font-bold"
                                 style={{
-                                    background: graceGold > 0 ? "rgba(245,158,11,0.15)" : "hsl(150 20% 10%)",
-                                    border: `1px solid ${graceGold > 0 ? "rgba(245,158,11,0.3)" : "hsl(150 15% 13%)"}`,
-                                    color: graceGold > 0 ? "#f59e0b" : "hsl(150 10% 35%)",
+                                    background: graceGold > 0 ? "rgba(245,158,11,0.15)" : "var(--surface-2)",
+                                    border: `1px solid ${graceGold > 0 ? "rgba(245,158,11,0.3)" : "var(--divider)"}`,
+                                    color: graceGold > 0 ? "#f59e0b" : "var(--text-muted)",
                                 }}>
                                 {graceGold > 0 ? "Use Gold Card" : "None available"}
                             </button>
@@ -584,7 +584,7 @@ export function Dashboard() {
             <div className="surface-card p-5">
                 <div className="flex items-center gap-2 mb-4">
                     <Calendar className="h-4 w-4" style={{ color: "var(--green)" }} />
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                         Consistency Map
                     </h2>
                 </div>

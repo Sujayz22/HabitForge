@@ -39,7 +39,7 @@ export function ResetPassword() {
 
     if (!token) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "hsl(150 30% 4%)" }}>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "hsl(var(--background))" }}>
                 <div className="text-center">
                     <p className="font-semibold mb-2" style={{ color: "#ef4444" }}>Invalid reset link</p>
                     <Link to="/forgot-password" className="text-sm" style={{ color: "var(--green)" }}>Request a new one</Link>
@@ -50,7 +50,7 @@ export function ResetPassword() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4"
-            style={{ background: "hsl(150 30% 4%)" }}>
+            style={{ background: "hsl(var(--background))" }}>
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8">
@@ -58,25 +58,25 @@ export function ResetPassword() {
                         style={{ background: "var(--green-dim)", border: "1px solid rgba(19,236,106,0.25)" }}>
                         <KeyRound className="h-6 w-6" style={{ color: "var(--green)" }} />
                     </div>
-                    <h1 className="text-2xl font-extrabold" style={{ color: "hsl(150 10% 95%)" }}>Reset Password</h1>
-                    <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>Choose a strong new password</p>
+                    <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-primary)" }}>Reset Password</h1>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Choose a strong new password</p>
                 </div>
 
-                <div className="rounded-2xl p-6" style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 13%)" }}>
+                <div className="rounded-2xl p-6" style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
                     {status === "success" ? (
                         <div className="text-center py-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-full mx-auto mb-4"
                                 style={{ background: "var(--green-dim)" }}>
                                 <Check className="h-6 w-6" style={{ color: "var(--green)" }} />
                             </div>
-                            <p className="font-semibold mb-1" style={{ color: "hsl(150 10% 90%)" }}>Password reset!</p>
-                            <p className="text-sm" style={{ color: "hsl(150 10% 55%)" }}>{message}</p>
-                            <p className="text-xs mt-2" style={{ color: "hsl(150 10% 40%)" }}>Redirecting to login…</p>
+                            <p className="font-semibold mb-1" style={{ color: "var(--text-heading)" }}>Password reset!</p>
+                            <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>{message}</p>
+                            <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>Redirecting to login…</p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <div>
-                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--text-tertiary)" }}>
                                     New password
                                 </label>
                                 <input
@@ -87,11 +87,11 @@ export function ResetPassword() {
                                     required
                                     autoFocus
                                     className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--text-tertiary)" }}>
                                     Confirm new password
                                 </label>
                                 <input
@@ -101,7 +101,7 @@ export function ResetPassword() {
                                     placeholder="••••••••"
                                     required
                                     className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                 />
                             </div>
 
@@ -115,7 +115,7 @@ export function ResetPassword() {
                                 type="submit"
                                 disabled={status === "loading"}
                                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold disabled:opacity-60"
-                                style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}
+                                style={{ background: "var(--green)", color: "var(--save-btn-text)" }}
                             >
                                 {status === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
                                 Reset Password

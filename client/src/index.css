@@ -43,6 +43,93 @@
     --surface: hsl(150 20% 7%);
     --surface-2: hsl(150 15% 10%);
     --surface-3: hsl(150 12% 13%);
+
+    /* Semantic tokens for inline-style migration */
+    --text-primary: hsl(150 10% 95%);
+    --text-secondary: hsl(150 10% 50%);
+    --text-tertiary: hsl(150 10% 55%);
+    --text-muted: hsl(150 10% 45%);
+    --text-label: hsl(150 10% 70%);
+    --text-body: hsl(150 10% 85%);
+    --text-heading: hsl(150 10% 90%);
+    --input-bg: hsl(150 15% 10%);
+    --input-border: hsl(150 15% 16%);
+    --input-text: hsl(150 10% 90%);
+    --divider: hsl(150 15% 11%);
+    --btn-secondary-bg: hsl(150 20% 10%);
+    --btn-secondary-text: hsl(150 10% 80%);
+    --btn-secondary-border: hsl(150 15% 16%);
+    --danger: hsl(0 60% 55%);
+    --danger-text: hsl(0 60% 60%);
+    --danger-desc: hsl(0 60% 50%);
+    --danger-border: rgba(239, 68, 68, 0.2);
+    --danger-bg: rgba(239, 68, 68, 0.1);
+    --save-btn-text: hsl(150 30% 4%);
+    --modal-bg: hsl(150 20% 7%);
+    --modal-overlay: rgba(0, 0, 0, 0.6);
+    --delete-confirm-bg: hsl(150 20% 4%);
+  }
+
+  /* ── Light mode overrides ──────────────────────────────────────────── */
+  .light {
+    --background: 150 10% 98%;
+    --foreground: 150 20% 10%;
+
+    --card: 150 10% 100%;
+    --card-foreground: 150 20% 10%;
+
+    --popover: 150 10% 100%;
+    --popover-foreground: 150 20% 10%;
+
+    --primary: 145 75% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 150 10% 93%;
+    --secondary-foreground: 150 15% 25%;
+
+    --muted: 150 10% 93%;
+    --muted-foreground: 150 10% 40%;
+
+    --accent: 145 75% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 150 10% 88%;
+    --input: 150 10% 93%;
+    --ring: 145 75% 38%;
+
+    --green: #0cba54;
+    --green-dim: rgba(12, 186, 84, 0.1);
+    --green-glow: rgba(12, 186, 84, 0.2);
+    --surface: hsl(150 10% 100%);
+    --surface-2: hsl(150 10% 96%);
+    --surface-3: hsl(150 10% 93%);
+
+    --text-primary: hsl(150 20% 10%);
+    --text-secondary: hsl(150 10% 40%);
+    --text-tertiary: hsl(150 10% 35%);
+    --text-muted: hsl(150 10% 45%);
+    --text-label: hsl(150 10% 35%);
+    --text-body: hsl(150 15% 25%);
+    --text-heading: hsl(150 20% 15%);
+    --input-bg: hsl(150 10% 96%);
+    --input-border: hsl(150 10% 85%);
+    --input-text: hsl(150 20% 10%);
+    --divider: hsl(150 10% 90%);
+    --btn-secondary-bg: hsl(150 10% 96%);
+    --btn-secondary-text: hsl(150 15% 30%);
+    --btn-secondary-border: hsl(150 10% 85%);
+    --danger: hsl(0 60% 50%);
+    --danger-text: hsl(0 60% 50%);
+    --danger-desc: hsl(0 50% 45%);
+    --danger-border: rgba(239, 68, 68, 0.25);
+    --danger-bg: rgba(239, 68, 68, 0.06);
+    --save-btn-text: hsl(0 0% 100%);
+    --modal-bg: hsl(0 0% 100%);
+    --modal-overlay: rgba(0, 0, 0, 0.3);
+    --delete-confirm-bg: hsl(150 10% 96%);
   }
 }
 
@@ -52,6 +139,9 @@
   }
   html {
     color-scheme: dark;
+  }
+  html.light {
+    color-scheme: light;
   }
   body {
     @apply bg-background text-foreground;
@@ -69,12 +159,12 @@
   }
   .surface-card {
     background: var(--surface);
-    border: 1px solid hsl(150 15% 14%);
+    border: 1px solid hsl(var(--border));
     border-radius: 12px;
   }
   .surface-card-2 {
     background: var(--surface-2);
-    border: 1px solid hsl(150 12% 16%);
+    border: 1px solid var(--input-border);
     border-radius: 10px;
   }
   .badge-green {
@@ -102,7 +192,7 @@
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: hsl(150 10% 55%);
+    color: var(--text-secondary);
     transition: all 0.15s ease;
     cursor: pointer;
     text-decoration: none;
@@ -118,7 +208,7 @@
   }
   .habit-card {
     background: var(--surface);
-    border: 1px solid hsl(150 15% 14%);
+    border: 1px solid hsl(var(--border));
     border-radius: 12px;
     padding: 16px;
     transition: border-color 0.15s ease;
@@ -130,7 +220,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid hsl(150 15% 20%);
+    border: 2px solid var(--input-border);
     background: transparent;
     display: flex;
     align-items: center;
@@ -154,7 +244,7 @@
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(150 15% 20%);
+    background: var(--input-border);
     border-radius: 2px;
   }
 }

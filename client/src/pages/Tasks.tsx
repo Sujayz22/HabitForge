@@ -84,7 +84,7 @@ function CharCounter({ current, max }: { current: number; max: number }) {
     const over = current > max
     const close = current > max * 0.8
     return (
-        <span className="text-[10px] font-mono" style={{ color: over ? "#ef4444" : close ? "#f59e0b" : "hsl(150 10% 40%)" }}>
+        <span className="text-[10px] font-mono" style={{ color: over ? "#ef4444" : close ? "#f59e0b" : "var(--text-muted)" }}>
             {current}/{max}
         </span>
     )
@@ -291,24 +291,24 @@ export function Tasks() {
             <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>
                             Task Forge
                         </h1>
-                        <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>
+                        <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                             One-off tasks with difficulty-based XP rewards
                         </p>
                     </div>
                     <button onClick={() => setShowForm(v => !v)}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105 flex-shrink-0"
-                        style={{ background: "#13ec6a", color: "hsl(150 30% 4%)", boxShadow: "0 0 16px rgba(19,236,106,0.35)" }}>
+                        style={{ background: "#13ec6a", color: "var(--save-btn-text)", boxShadow: "0 0 16px rgba(19,236,106,0.35)" }}>
                         <Plus className="h-4 w-4" /> Forge Task
                     </button>
                 </div>
                 {/* Sort control — scrollable on mobile */}
                 <div className="overflow-x-auto pb-0.5">
                     <div className="flex items-center gap-1 p-1 rounded-xl w-max"
-                        style={{ background: "hsl(150 15% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
-                        <ArrowUpDown className="h-3.5 w-3.5 ml-1 flex-shrink-0" style={{ color: "hsl(150 10% 40%)" }} />
+                        style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
+                        <ArrowUpDown className="h-3.5 w-3.5 ml-1 flex-shrink-0" style={{ color: "var(--text-muted)" }} />
                         {([
                             { key: "default", label: "Default" },
                             { key: "deadline", label: "Deadline" },
@@ -319,7 +319,7 @@ export function Tasks() {
                                 className="px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all whitespace-nowrap"
                                 style={{
                                     background: sortBy === key ? "var(--green-dim)" : "transparent",
-                                    color: sortBy === key ? "var(--green)" : "hsl(150 10% 45%)",
+                                    color: sortBy === key ? "var(--green)" : "var(--text-muted)",
                                 }}>
                                 {label}
                             </button>
@@ -331,7 +331,7 @@ export function Tasks() {
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                    { icon: ListTodo, label: "Total Tasks", value: stats?.total ?? 0, color: "hsl(150 10% 70%)" },
+                    { icon: ListTodo, label: "Total Tasks", value: stats?.total ?? 0, color: "var(--text-label)" },
                     { icon: CheckCircle2, label: "Done Today", value: stats?.completedToday ?? 0, color: "#22c55e" },
                     { icon: Zap, label: "XP Today", value: `+${stats?.xpEarnedToday ?? 0}`, color: "#f59e0b" },
                     { icon: Clock, label: "Pending", value: stats?.pending ?? 0, color: "#3b82f6" },
@@ -339,7 +339,7 @@ export function Tasks() {
                     <div key={label} className="surface-card p-4 flex flex-col gap-1">
                         <Icon className="h-4 w-4 mb-1" style={{ color }} />
                         <div className="text-xl font-extrabold" style={{ color }}>{value}</div>
-                        <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{label}</div>
+                        <div className="text-xs" style={{ color: "var(--text-muted)" }}>{label}</div>
                     </div>
                 ))}
             </div>
@@ -356,12 +356,12 @@ export function Tasks() {
                         {/* Modal header */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-lg font-bold" style={{ color: "hsl(150 10% 92%)" }}>New Task Protocol</h2>
-                                <p className="text-xs mt-0.5" style={{ color: "hsl(150 10% 45%)" }}>Forge a task and earn XP on completion</p>
+                                <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>New Task Protocol</h2>
+                                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>Forge a task and earn XP on completion</p>
                             </div>
                             <button onClick={resetForm}
                                 className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-                                style={{ color: "hsl(150 10% 50%)" }}>
+                                style={{ color: "var(--text-secondary)" }}>
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
@@ -369,7 +369,7 @@ export function Tasks() {
                         {/* Title */}
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-xs font-semibold" style={{ color: "hsl(150 10% 55%)" }}>Title *</label>
+                                <label className="text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>Title *</label>
                                 <CharCounter current={title.length} max={TITLE_MAX} />
                             </div>
                             <input value={title} onChange={e => setTitle(e.target.value)}
@@ -377,14 +377,14 @@ export function Tasks() {
                                 autoFocus
                                 maxLength={TITLE_MAX + 10}
                                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                                style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
 
                         {/* Description */}
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-xs font-semibold" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                                <label className="text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>Description</label>
                                 <CharCounter current={desc.length} max={DESC_MAX} />
                             </div>
                             <textarea value={desc} onChange={e => setDesc(e.target.value)}
@@ -392,22 +392,22 @@ export function Tasks() {
                                 rows={2}
                                 maxLength={DESC_MAX + 10}
                                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none resize-none"
-                                style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
 
                         {/* Difficulty + Priority */}
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Difficulty</label>
                                 <div className="flex gap-1.5 flex-wrap">
                                     {DIFFICULTIES.map(d => (
                                         <button key={d.key} type="button" onClick={() => setDiff(d.key)}
                                             className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
                                             style={{
-                                                background: diff === d.key ? d.bg : "hsl(150 15% 10%)",
-                                                color: diff === d.key ? d.color : "hsl(150 10% 45%)",
-                                                border: `1px solid ${diff === d.key ? d.color + "44" : "hsl(150 15% 16%)"}`,
+                                                background: diff === d.key ? d.bg : "var(--surface-2)",
+                                                color: diff === d.key ? d.color : "var(--text-muted)",
+                                                border: `1px solid ${diff === d.key ? d.color + "44" : "var(--input-border)"}`,
                                             }}>
                                             {d.label}
                                         </button>
@@ -415,17 +415,17 @@ export function Tasks() {
                                 </div>
                             </div>
                             <div>
-                                <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                    Priority <span style={{ color: "hsl(150 10% 35%)" }}>(optional)</span>
+                                <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
+                                    Priority <span style={{ color: "var(--text-muted)" }}>(optional)</span>
                                 </label>
                                 <div className="flex gap-1.5 flex-wrap">
                                     {PRIORITIES.map(p => (
                                         <button key={p.key} type="button" onClick={() => setPriority(prev => prev === p.key ? "" : p.key)}
                                             className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
                                             style={{
-                                                background: priority === p.key ? p.bg : "hsl(150 15% 10%)",
-                                                color: priority === p.key ? p.color : "hsl(150 10% 45%)",
-                                                border: `1px solid ${priority === p.key ? p.color + "44" : "hsl(150 15% 16%)"}`,
+                                                background: priority === p.key ? p.bg : "var(--surface-2)",
+                                                color: priority === p.key ? p.color : "var(--text-muted)",
+                                                border: `1px solid ${priority === p.key ? p.color + "44" : "var(--input-border)"}`,
                                             }}>
                                             {p.label}
                                         </button>
@@ -438,8 +438,8 @@ export function Tasks() {
                         <div className="flex flex-col gap-3">
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                        Deadline <span style={{ color: "hsl(150 10% 35%)" }}>(optional)</span>
+                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
+                                        Deadline <span style={{ color: "var(--text-muted)" }}>(optional)</span>
                                     </label>
                                     <input
                                         type="datetime-local"
@@ -447,7 +447,7 @@ export function Tasks() {
                                         min={todayMin}
                                         onChange={e => { setDeadline(e.target.value); if (!e.target.value) { setReminder(false); setReminderAt("") } }}
                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                        style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 80%)" }}
+                                        style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--btn-secondary-text)" }}
                                     />
                                 </div>
                                 <div className="flex flex-col justify-end">
@@ -457,21 +457,21 @@ export function Tasks() {
                                         onClick={() => { if (deadline) { setReminder(v => !v); setReminderAt("") } }}
                                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
                                         style={{
-                                            background: reminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 10%)",
-                                            color: reminder ? "var(--green)" : "hsl(150 10% 45%)",
-                                            border: `1px solid ${reminder ? "rgba(19,236,106,0.3)" : "hsl(150 15% 16%)"}`,
+                                            background: reminder ? "rgba(19,236,106,0.12)" : "var(--surface-2)",
+                                            color: reminder ? "var(--green)" : "var(--text-muted)",
+                                            border: `1px solid ${reminder ? "rgba(19,236,106,0.3)" : "var(--input-border)"}`,
                                         }}>
                                         <Bell className="h-3.5 w-3.5" />
                                         {reminder ? "Reminder on" : "Set reminder"}
                                     </button>
                                     {!deadline && (
-                                        <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Set a deadline to enable reminder</p>
+                                        <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Set a deadline to enable reminder</p>
                                     )}
                                 </div>
                             </div>
                             {reminder && (
                                 <div>
-                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
                                         🔔 Remind me at
                                     </label>
                                     <input
@@ -481,15 +481,15 @@ export function Tasks() {
                                         max={deadline}
                                         onChange={e => setReminderAt(e.target.value)}
                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                        style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "hsl(150 10% 85%)" }}
+                                        style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "var(--text-body)" }}
                                     />
-                                    <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Pick when you want the notification — before or at the deadline</p>
+                                    <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Pick when you want the notification — before or at the deadline</p>
                                 </div>
                             )}
                         </div>
 
                         {/* Divider */}
-                        <div style={{ borderTop: "1px solid hsl(150 15% 12%)" }} />
+                        <div style={{ borderTop: "1px solid var(--divider)" }} />
 
                         {/* XP preview + actions */}
                         <div className="flex items-center justify-between">
@@ -499,13 +499,13 @@ export function Tasks() {
                             <div className="flex gap-2">
                                 <button onClick={resetForm}
                                     className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                    style={{ background: "hsl(150 15% 10%)", color: "hsl(150 10% 55%)" }}>
+                                    style={{ background: "var(--surface-2)", color: "var(--text-tertiary)" }}>
                                     Cancel
                                 </button>
                                 <button onClick={() => createMutation.mutate()}
                                     disabled={!canCreate || createMutation.isPending}
                                     className="px-4 py-2 rounded-lg text-sm font-bold transition-all disabled:opacity-50"
-                                    style={{ background: "#13ec6a", color: "hsl(150 30% 4%)" }}>
+                                    style={{ background: "#13ec6a", color: "var(--save-btn-text)" }}>
                                     {createMutation.isPending ? "Forging..." : "Forge Task"}
                                 </button>
                             </div>
@@ -519,7 +519,7 @@ export function Tasks() {
             <div className="surface-card p-5">
                 <div className="flex items-center gap-2 mb-4">
                     <Target className="h-4 w-4" style={{ color: "#3b82f6" }} />
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                         Pending
                     </h2>
                     <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded"
@@ -529,9 +529,9 @@ export function Tasks() {
                 </div>
 
                 {isLoading ? (
-                    <div className="text-sm py-6 text-center" style={{ color: "hsl(150 10% 40%)" }}>Loading...</div>
+                    <div className="text-sm py-6 text-center" style={{ color: "var(--text-muted)" }}>Loading...</div>
                 ) : sortedPending.length === 0 ? (
-                    <div className="text-center py-8 text-sm" style={{ color: "hsl(150 10% 40%)" }}>
+                    <div className="text-center py-8 text-sm" style={{ color: "var(--text-muted)" }}>
                         No pending tasks. Forge a new one! ⚡
                     </div>
                 ) : (
@@ -540,23 +540,23 @@ export function Tasks() {
                             <div key={task._id}>
                                 {/* ── Task row ── */}
                                 <div className="flex flex-col gap-1.5 p-3 rounded-xl transition-all"
-                                    style={{ background: "hsl(150 15% 10%)", border: `1px solid ${editingTaskId === task._id ? "hsl(150 30% 22%)" : "hsl(150 12% 14%)"}` }}>
+                                    style={{ background: "var(--surface-2)", border: `1px solid ${editingTaskId === task._id ? "var(--input-border)" : "hsl(var(--border))"}` }}>
                                     <div className="flex items-center gap-3">
                                         {/* Complete button */}
                                         <button
                                             onClick={() => completeMutation.mutate(task._id)}
                                             disabled={completeMutation.isPending}
                                             className="h-5 w-5 rounded-full border-2 flex-shrink-0 transition-all hover:scale-110"
-                                            style={{ borderColor: "hsl(150 20% 30%)" }}
+                                            style={{ borderColor: "var(--input-border)" }}
                                             title="Mark complete"
                                         />
                                         {/* Title + desc */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 90%)" }}>
+                                            <div className="text-sm font-semibold truncate" style={{ color: "var(--text-heading)" }}>
                                                 {task.title}
                                             </div>
                                             {task.description && (
-                                                <div className="text-xs truncate mt-0.5" style={{ color: "hsl(150 10% 45%)" }}>
+                                                <div className="text-xs truncate mt-0.5" style={{ color: "var(--text-muted)" }}>
                                                     {task.description}
                                                 </div>
                                             )}
@@ -570,7 +570,7 @@ export function Tasks() {
                                         <button
                                             onClick={() => editingTaskId === task._id ? closeEdit() : openEdit(task)}
                                             className="flex-shrink-0 p-1 rounded-lg opacity-50 hover:opacity-100 transition-opacity"
-                                            style={{ color: editingTaskId === task._id ? "var(--green)" : "hsl(150 10% 60%)" }}
+                                            style={{ color: editingTaskId === task._id ? "var(--green)" : "var(--text-tertiary)" }}
                                             title="Edit task"
                                         >
                                             {editingTaskId === task._id
@@ -602,7 +602,7 @@ export function Tasks() {
                                 {/* ── Inline Edit Panel ── */}
                                 {editingTaskId === task._id && (
                                     <div className="mt-1 p-4 rounded-xl flex flex-col gap-3"
-                                        style={{ background: "hsl(150 15% 8%)", border: "1px solid hsl(150 25% 18%)" }}>
+                                        style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)" }}>
                                         <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--green)" }}>
                                             Edit Task
                                         </p>
@@ -610,7 +610,7 @@ export function Tasks() {
                                         {/* Edit Title */}
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <label className="text-xs font-semibold" style={{ color: "hsl(150 10% 55%)" }}>Title *</label>
+                                                <label className="text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>Title *</label>
                                                 <CharCounter current={editTitle.length} max={TITLE_MAX} />
                                             </div>
                                             <input
@@ -618,14 +618,14 @@ export function Tasks() {
                                                 onChange={e => setEditTitle(e.target.value)}
                                                 maxLength={TITLE_MAX + 10}
                                                 className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 20% 20%)", color: "hsl(150 10% 90%)" }}
+                                                style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                             />
                                         </div>
 
                                         {/* Edit Description */}
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <label className="text-xs font-semibold" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                                                <label className="text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>Description</label>
                                                 <CharCounter current={editDesc.length} max={DESC_MAX} />
                                             </div>
                                             <textarea
@@ -634,22 +634,22 @@ export function Tasks() {
                                                 rows={2}
                                                 maxLength={DESC_MAX + 10}
                                                 className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-                                                style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 20% 20%)", color: "hsl(150 10% 90%)" }}
+                                                style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                             />
                                         </div>
 
                                         {/* Edit Difficulty */}
                                         <div>
-                                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
+                                            <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Difficulty</label>
                                             <div className="flex gap-1.5 flex-wrap">
                                                 {DIFFICULTIES.map(d => (
                                                     <button key={d.key} type="button"
                                                         onClick={() => setEditDiff(d.key)}
                                                         className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
                                                         style={{
-                                                            background: editDiff === d.key ? d.bg : "hsl(150 15% 12%)",
-                                                            color: editDiff === d.key ? d.color : "hsl(150 10% 45%)",
-                                                            border: `1px solid ${editDiff === d.key ? d.color + "44" : "hsl(150 20% 20%)"}`,
+                                                            background: editDiff === d.key ? d.bg : "var(--surface-3)",
+                                                            color: editDiff === d.key ? d.color : "var(--text-muted)",
+                                                            border: `1px solid ${editDiff === d.key ? d.color + "44" : "var(--input-border)"}`,
                                                         }}>
                                                         {d.label}
                                                     </button>
@@ -659,8 +659,8 @@ export function Tasks() {
 
                                         {/* Edit Priority */}
                                         <div>
-                                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
-                                                Priority <span style={{ color: "hsl(150 10% 35%)" }}>(optional)</span>
+                                            <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
+                                                Priority <span style={{ color: "var(--text-muted)" }}>(optional)</span>
                                             </label>
                                             <div className="flex gap-1.5 flex-wrap">
                                                 {PRIORITIES.map(p => (
@@ -668,9 +668,9 @@ export function Tasks() {
                                                         onClick={() => setEditPriority(prev => prev === p.key ? "" : p.key)}
                                                         className="px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
                                                         style={{
-                                                            background: editPriority === p.key ? p.bg : "hsl(150 15% 12%)",
-                                                            color: editPriority === p.key ? p.color : "hsl(150 10% 45%)",
-                                                            border: `1px solid ${editPriority === p.key ? p.color + "44" : "hsl(150 20% 20%)"}`,
+                                                            background: editPriority === p.key ? p.bg : "var(--surface-3)",
+                                                            color: editPriority === p.key ? p.color : "var(--text-muted)",
+                                                            border: `1px solid ${editPriority === p.key ? p.color + "44" : "var(--input-border)"}`,
                                                         }}>
                                                         {p.label}
                                                     </button>
@@ -682,7 +682,7 @@ export function Tasks() {
                                         <div className="flex flex-col gap-3">
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
-                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
                                                         Deadline
                                                     </label>
                                                     <input
@@ -694,7 +694,7 @@ export function Tasks() {
                                                             if (!e.target.value) { setEditReminder(false); setEditReminderAt("") }
                                                         }}
                                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                                        style={{ background: "hsl(150 15% 12%)", border: "1px solid hsl(150 20% 20%)", color: "hsl(150 10% 80%)" }}
+                                                        style={{ background: "var(--surface-3)", border: "1px solid var(--input-border)", color: "var(--btn-secondary-text)" }}
                                                     />
                                                 </div>
                                                 <div className="flex flex-col justify-end">
@@ -704,9 +704,9 @@ export function Tasks() {
                                                         onClick={() => { if (editDeadline) { setEditReminder(v => !v); setEditReminderAt("") } }}
                                                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-30"
                                                         style={{
-                                                            background: editReminder ? "rgba(19,236,106,0.12)" : "hsl(150 15% 12%)",
-                                                            color: editReminder ? "var(--green)" : "hsl(150 10% 45%)",
-                                                            border: `1px solid ${editReminder ? "rgba(19,236,106,0.3)" : "hsl(150 20% 20%)"}`,
+                                                            background: editReminder ? "rgba(19,236,106,0.12)" : "var(--surface-3)",
+                                                            color: editReminder ? "var(--green)" : "var(--text-muted)",
+                                                            border: `1px solid ${editReminder ? "rgba(19,236,106,0.3)" : "var(--input-border)"}`,
                                                         }}>
                                                         <Bell className="h-3.5 w-3.5" />
                                                         {editReminder ? "Reminder on" : "Set reminder"}
@@ -716,7 +716,7 @@ export function Tasks() {
                                             {/* Reminder time picker */}
                                             {editReminder && (
                                                 <div>
-                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                                    <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
                                                         🔔 Remind me at
                                                     </label>
                                                     <input
@@ -726,9 +726,9 @@ export function Tasks() {
                                                         max={editDeadline}
                                                         onChange={e => setEditReminderAt(e.target.value)}
                                                         className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                                        style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "hsl(150 10% 85%)" }}
+                                                        style={{ background: "rgba(19,236,106,0.06)", border: "1px solid rgba(19,236,106,0.25)", color: "var(--text-body)" }}
                                                     />
-                                                    <p className="text-[10px] mt-1" style={{ color: "hsl(150 10% 35%)" }}>Pick when you want the notification</p>
+                                                    <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Pick when you want the notification</p>
                                                 </div>
                                             )}
                                         </div>
@@ -737,7 +737,7 @@ export function Tasks() {
                                         <div className="flex justify-end gap-2 pt-1">
                                             <button onClick={closeEdit}
                                                 className="px-4 py-1.5 rounded-lg text-xs font-semibold"
-                                                style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 55%)" }}>
+                                                style={{ background: "var(--surface-3)", color: "var(--text-tertiary)" }}>
                                                 Cancel
                                             </button>
                                             <button
@@ -755,7 +755,7 @@ export function Tasks() {
                                                     updateMutation.mutate({ taskId: task._id, oldDeadline: task.deadline, params })
                                                 }}
                                                 className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
-                                                style={{ background: "#13ec6a", color: "hsl(150 30% 4%)" }}>
+                                                style={{ background: "#13ec6a", color: "var(--save-btn-text)" }}>
                                                 <Check className="h-3.5 w-3.5" />
                                                 {updateMutation.isPending ? "Saving..." : "Save"}
                                             </button>
@@ -772,7 +772,7 @@ export function Tasks() {
             <div className="surface-card p-5">
                 <div className="flex items-center gap-2 mb-4">
                     <CheckCircle2 className="h-4 w-4" style={{ color: "#22c55e" }} />
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
                         Completed
                     </h2>
                     <span className="ml-auto badge-green">{completed.length}</span>
@@ -789,17 +789,17 @@ export function Tasks() {
                 </div>
 
                 {completed.length === 0 ? (
-                    <div className="text-center py-8 text-sm" style={{ color: "hsl(150 10% 40%)" }}>
+                    <div className="text-center py-8 text-sm" style={{ color: "var(--text-muted)" }}>
                         Complete some tasks to see them here
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
                         {completed.map(task => (
                             <div key={task._id} className="flex items-center gap-3 p-3 rounded-xl opacity-60"
-                                style={{ background: "hsl(150 15% 9%)", border: "1px solid hsl(150 12% 13%)" }}>
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--divider)" }}>
                                 <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: "#22c55e" }} />
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-sm line-through truncate" style={{ color: "hsl(150 10% 65%)" }}>
+                                    <div className="text-sm line-through truncate" style={{ color: "var(--text-tertiary)" }}>
                                         {task.title}
                                     </div>
                                 </div>

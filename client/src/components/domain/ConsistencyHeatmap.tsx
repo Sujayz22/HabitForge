@@ -23,7 +23,7 @@ const CAT_COLORS: Record<string, string> = {
 
 // ── Heatmap colour ─────────────────────────────────────────────────
 function getHeatColor(count: number, max: number) {
-    if (count === 0) return "hsl(150 15% 10%)"
+    if (count === 0) return "var(--surface-2)"
     const t = Math.min(count / max, 1)
     if (t < 0.25) return "rgba(19,236,106,0.2)"
     if (t < 0.5) return "rgba(19,236,106,0.4)"
@@ -62,7 +62,7 @@ function CategoryRadar({ data }: { data: { label: string; value: number; color: 
                         key={frac}
                         points={pts.join(" ")}
                         fill="none"
-                        stroke="hsl(150 15% 15%)"
+                        stroke="hsl(var(--border))"
                         strokeWidth={1}
                     />
                 )
@@ -76,7 +76,7 @@ function CategoryRadar({ data }: { data: { label: string; value: number; color: 
                         x1={cx} y1={cy}
                         x2={cx + Math.cos(a) * r}
                         y2={cy + Math.sin(a) * r}
-                        stroke="hsl(150 15% 18%)"
+                        stroke="var(--input-border)"
                         strokeWidth={1}
                     />
                 )
@@ -92,7 +92,7 @@ function CategoryRadar({ data }: { data: { label: string; value: number; color: 
             {polyPoints.map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r={4}
                     fill={data[i].color}
-                    stroke="hsl(150 20% 8%)"
+                    stroke="var(--surface)"
                     strokeWidth={1}
                 />
             ))}
@@ -120,7 +120,7 @@ function CategoryRadar({ data }: { data: { label: string; value: number; color: 
                             textAnchor="middle"
                             dominantBaseline="middle"
                             fontSize={8}
-                            fill="hsl(150 10% 40%)"
+                            fill="var(--text-muted)"
                             fontFamily="Manrope, sans-serif"
                         >
                             {d.value}
@@ -209,7 +209,7 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
             <div className="flex flex-col sm:flex-row gap-4 items-stretch">
                 {/* Heatmap side — cells stretch to fill available width */}
                 <div className="flex flex-col gap-3 flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "hsl(150 10% 40%)" }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                         Completion history (6 months)
                     </p>
                     <div className="flex gap-[3px] w-full">
@@ -217,7 +217,7 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
                         <div className="flex flex-col gap-[3px] flex-shrink-0" style={{ width: 18 }}>
                             <div style={{ height: 14 }} />
                             {DAYS.map(d => (
-                                <div key={d} className="text-[9px] flex items-center" style={{ color: "hsl(150 10% 35%)", height: 14 }}>{d[0]}</div>
+                                <div key={d} className="text-[9px] flex items-center" style={{ color: "var(--text-muted)", height: 14 }}>{d[0]}</div>
                             ))}
                         </div>
                         {/* Columns — each flex-1 so they share remaining width */}
@@ -227,7 +227,7 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
                             const showMonth = wi === 0 || (firstDate && new Date(firstDate).getDate() <= 7)
                             return (
                                 <div key={wi} className="flex-1 flex flex-col gap-[3px] min-w-0">
-                                    <div className="text-[9px]" style={{ color: "hsl(150 10% 35%)", height: 14, overflow: "hidden" }}>
+                                    <div className="text-[9px]" style={{ color: "var(--text-muted)", height: 14, overflow: "hidden" }}>
                                         {showMonth ? monthLabel : ""}
                                     </div>
                                     {week.map(cell => (
@@ -240,7 +240,7 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
                                                 maxWidth: 18,
                                                 aspectRatio: "1 / 1",
                                                 background: getHeatColor(cell.count, maxCount),
-                                                border: "1px solid hsl(150 15% 11%)",
+                                                border: "1px solid var(--divider)",
                                             }}
                                         />
                                     ))}
@@ -250,22 +250,22 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
                     </div>
                     {/* Legend */}
                     <div className="flex items-center gap-2">
-                        <span className="text-[10px]" style={{ color: "hsl(150 10% 35%)" }}>Less</span>
+                        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Less</span>
                         {[0, 0.25, 0.5, 0.75, 1].map(v => (
                             <div key={v} className="h-3 w-3 rounded-sm"
-                                style={{ background: v === 0 ? "hsl(150 15% 10%)" : `rgba(19,236,106,${v * 0.9 + 0.1})` }} />
+                                style={{ background: v === 0 ? "var(--surface-2)" : `rgba(19,236,106,${v * 0.9 + 0.1})` }} />
                         ))}
-                        <span className="text-[10px]" style={{ color: "hsl(150 10% 35%)" }}>More</span>
+                        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>More</span>
                     </div>
                 </div>
 
                 {/* Divider */}
-                <div className="hidden sm:block w-px self-stretch" style={{ background: "hsl(150 15% 13%)" }} />
-                <div className="block sm:hidden h-px w-full" style={{ background: "hsl(150 15% 13%)" }} />
+                <div className="hidden sm:block w-px self-stretch" style={{ background: "var(--divider)" }} />
+                <div className="block sm:hidden h-px w-full" style={{ background: "var(--divider)" }} />
 
                 {/* Radar side */}
                 <div className="flex flex-col items-center gap-2 w-full sm:w-[280px] sm:flex-shrink-0" >
-                    <p className="text-[10px] font-semibold uppercase tracking-wider self-start" style={{ color: "hsl(150 10% 40%)" }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider self-start" style={{ color: "var(--text-muted)" }}>
                         Habit category breakdown
                     </p>
                     <div className="w-full" style={{ aspectRatio: "1 / 1" }}>
@@ -276,26 +276,26 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
 
             {/* ── Bar Chart: last 7 days ── */}
             <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: "hsl(150 10% 40%)" }}>
+                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>
                     Last 7 days — completions
                 </p>
                 <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={barData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }} barCategoryGap="25%">
                         <XAxis
                             dataKey="day"
-                            tick={{ fill: "hsl(150 10% 45%)", fontSize: 11, fontFamily: "Manrope, sans-serif" }}
+                            tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: "Manrope, sans-serif" }}
                             axisLine={false}
                             tickLine={false}
                         />
                         <YAxis
-                            tick={{ fill: "hsl(150 10% 35%)", fontSize: 9 }}
+                            tick={{ fill: "var(--text-muted)", fontSize: 9 }}
                             axisLine={false}
                             tickLine={false}
                             allowDecimals={false}
                         />
                         <Tooltip
-                            contentStyle={{ background: "hsl(150 20% 8%)", border: "1px solid hsl(150 15% 14%)", borderRadius: 8 }}
-                            labelStyle={{ color: "hsl(150 10% 60%)", fontSize: 11, fontFamily: "Manrope, sans-serif" }}
+                            contentStyle={{ background: "var(--surface)", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                            labelStyle={{ color: "var(--text-tertiary)", fontSize: 11, fontFamily: "Manrope, sans-serif" }}
                             itemStyle={{ color: "#13ec6a", fontSize: 11 }}
                             formatter={(v: any) => [`${v} completion${v !== 1 ? "s" : ""}`]}
                             cursor={{ fill: "rgba(255,255,255,0.025)" }}
@@ -309,7 +309,7 @@ export function ConsistencyHeatmap({ logs, habits = [], weeks = 26 }: Consistenc
                                         fill={
                                             entry.count > 0
                                                 ? `rgba(19,236,106,${0.25 + intensity * 0.7})`
-                                                : "hsl(150 15% 11%)"
+                                                : "var(--divider)"
                                         }
                                         stroke={entry.count > 0 ? `rgba(19,236,106,${0.3 + intensity * 0.4})` : "none"}
                                         strokeWidth={1}

@@ -36,9 +36,9 @@ export function Login() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "hsl(150 30% 4%)" }}>
+        <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "hsl(var(--background))" }}>
             <Dialog open={!!error} onOpenChange={(open) => !open && setError("")}>
-                <DialogContent className="sm:max-w-md border-red-900/50" style={{ background: "hsl(150 20% 7%)" }}>
+                <DialogContent className="sm:max-w-md border-red-900/50" style={{ background: "var(--surface)" }}>
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-red-500">
                             <AlertTriangle className="h-5 w-5" />
@@ -64,19 +64,19 @@ export function Login() {
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-3 justify-center mb-8 hover:opacity-80 transition-opacity">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl"
-                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                         <Zap className="h-5 w-5" fill="currentColor" />
                     </div>
-                    <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "14px", color: "hsl(150 10% 95%)", letterSpacing: "0.02em" }}>HabitForge</span>
+                    <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "14px", color: "var(--text-primary)", letterSpacing: "0.02em" }}>HabitForge</span>
                 </Link>
 
                 <div className="surface-card p-6">
-                    <h1 className="text-xl font-bold mb-1" style={{ color: "hsl(150 10% 95%)" }}>Welcome back</h1>
-                    <p className="text-sm mb-6" style={{ color: "hsl(150 10% 50%)" }}>Sign in to your command center</p>
+                    <h1 className="text-xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>Welcome back</h1>
+                    <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>Sign in to your command center</p>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <div>
-                            <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>
+                            <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>
                                 {isEmail ? "Email" : identifier ? "Username" : "Email or Username"}
                             </label>
                             <input
@@ -85,12 +85,12 @@ export function Login() {
                                 placeholder="you@example.com or username"
                                 autoComplete="username"
                                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none transition-all"
-                                style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-xs font-semibold" style={{ color: "hsl(150 10% 55%)" }}>Password</label>
+                                <label className="text-xs font-semibold" style={{ color: "var(--text-tertiary)" }}>Password</label>
 
                             </div>
                             <input
@@ -99,12 +99,12 @@ export function Login() {
                                 placeholder="••••••••"
                                 autoComplete="current-password"
                                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none transition-all"
-                                style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                             />
                         </div>
                         <button type="submit" disabled={loading}
                             className="w-full py-2.5 rounded-lg text-sm font-bold transition-all mt-1"
-                            style={{ background: "var(--green)", color: "hsl(150 30% 4%)", opacity: loading ? 0.7 : 1 }}>
+                            style={{ background: "var(--green)", color: "var(--save-btn-text)", opacity: loading ? 0.7 : 1 }}>
                             {loading ? "Signing in..." : "Sign In"}
                         </button>
                     </form>
@@ -112,7 +112,7 @@ export function Login() {
                         style={{ color: "var(--green)" }}>
                         Forgot password?
                     </Link>
-                    <p className="text-center text-sm mt-4" style={{ color: "hsl(150 10% 45%)" }}>
+                    <p className="text-center text-sm mt-4" style={{ color: "var(--text-muted)" }}>
                         No account?{" "}
                         <Link to="/register" className="font-semibold" style={{ color: "var(--green)" }}>
                             Create one →
@@ -120,7 +120,8 @@ export function Login() {
                     </p>
 
                     <div className="mt-6 flex justify-center">
-                        <Link to="/" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+                        <Link to="/" className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+                            style={{ color: "var(--text-secondary)" }}>
                             <ArrowLeft className="h-4 w-4" /> Back to Home
                         </Link>
                     </div>

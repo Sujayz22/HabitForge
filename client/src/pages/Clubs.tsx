@@ -148,7 +148,7 @@ export function Clubs() {
                 <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-sm truncate" style={{ color: "hsl(150 10% 90%)" }}>{club.name}</h3>
+                            <h3 className="font-bold text-sm truncate" style={{ color: "var(--text-heading)" }}>{club.name}</h3>
                             {club.isPublic === false
                                 ? <Lock className="h-3 w-3 flex-shrink-0" style={{ color: "#f59e0b" }} />
                                 : <Globe className="h-3 w-3 flex-shrink-0" style={{ color: "#13ec6a" }} />
@@ -165,11 +165,11 @@ export function Clubs() {
                 </div>
 
                 {club.description && (
-                    <p className="text-xs line-clamp-2" style={{ color: "hsl(150 10% 50%)" }}>{club.description}</p>
+                    <p className="text-xs line-clamp-2" style={{ color: "var(--text-secondary)" }}>{club.description}</p>
                 )}
 
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 text-xs" style={{ color: "hsl(150 10% 50%)" }}>
+                    <div className="flex items-center gap-1 text-xs" style={{ color: "var(--text-secondary)" }}>
                         <Users className="h-3 w-3" /> {club.memberCount || 0} members
                     </div>
                     {club.isPublic === false && (
@@ -183,7 +183,7 @@ export function Clubs() {
                 {/* Action button */}
                 {isOwner ? (
                     <div className="w-full py-2 rounded-lg text-xs font-semibold text-center"
-                        style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 55%)" }}>
+                        style={{ background: "var(--surface-3)", color: "var(--text-tertiary)" }}>
                         Your Club
                     </div>
                 ) : isMember ? (
@@ -219,10 +219,10 @@ export function Clubs() {
             {/* Header */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>
                         Explore Clubs
                     </h1>
-                    <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                         Join accountability groups and compete with others
                     </p>
                 </div>
@@ -230,14 +230,14 @@ export function Clubs() {
                     <button
                         onClick={() => { setShowJoinByCode(true); setGlobalCode(""); setGlobalCodeError("") }}
                         className="flex items-center justify-center gap-2 flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold"
-                        style={{ background: "hsl(150 15% 11%)", border: "1px solid hsl(150 15% 18%)", color: "hsl(150 10% 75%)" }}
+                        style={{ background: "var(--divider)", border: "1px solid var(--input-border)", color: "var(--text-label)" }}
                     >
                         <Lock className="h-4 w-4" /> Join by Code
                     </button>
                     <button
                         onClick={() => setShowCreate(true)}
                         className="flex items-center justify-center gap-2 flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold"
-                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}
+                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}
                     >
                         <Plus className="h-4 w-4" /> Create Club
                     </button>
@@ -246,18 +246,18 @@ export function Clubs() {
 
             {/* Search bar */}
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" style={{ color: "hsl(150 10% 40%)" }} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" style={{ color: "var(--text-muted)" }} />
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Search public clubs or your private clubs..."
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm outline-none"
-                    style={{ background: "hsl(150 15% 9%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                 />
                 {searchQuery && (
                     <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2"
-                        style={{ color: "hsl(150 10% 40%)" }}>
+                        style={{ color: "var(--text-muted)" }}>
                         <X className="h-4 w-4" />
                     </button>
                 )}
@@ -266,12 +266,12 @@ export function Clubs() {
             {/* Search results (when query is active) */}
             {searchQuery.trim() && (
                 <div className="flex flex-col gap-3">
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                         Search Results ({searchResults.length})
                     </h2>
                     {searchResults.length === 0 ? (
                         <div className="surface-card p-8 text-center">
-                            <div className="text-sm" style={{ color: "hsl(150 10% 40%)" }}>No clubs found for "{searchQuery}"</div>
+                            <div className="text-sm" style={{ color: "var(--text-muted)" }}>No clubs found for "{searchQuery}"</div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -287,7 +287,7 @@ export function Clubs() {
                     {/* My Clubs Section */}
                     {myClubs.length > 0 && (
                         <div className="flex flex-col gap-3">
-                            <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>
+                            <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                                 My Clubs ({myClubs.length})
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -298,15 +298,15 @@ export function Clubs() {
 
                     {/* Discover Public Clubs */}
                     <div className="flex flex-col gap-3">
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 55%)" }}>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                             {myClubs.length > 0 ? "Discover More Clubs" : "All Clubs"}
                         </h2>
 
                         {publicLoading ? (
-                            <div className="text-sm" style={{ color: "hsl(150 10% 40%)" }}>Loading clubs...</div>
+                            <div className="text-sm" style={{ color: "var(--text-muted)" }}>Loading clubs...</div>
                         ) : publicClubs.length === 0 && myClubs.length === 0 ? (
                             <div className="text-center py-12">
-                                <div className="text-sm mb-2" style={{ color: "hsl(150 10% 40%)" }}>No clubs yet. Be the first!</div>
+                                <div className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>No clubs yet. Be the first!</div>
                                 <button onClick={() => setShowCreate(true)} className="text-sm underline" style={{ color: "var(--green)" }}>
                                     Create a club →
                                 </button>
@@ -318,15 +318,15 @@ export function Clubs() {
                                     .map((club: Club) => renderClubCard(club))}
                                 {/* Create CTA */}
                                 <div className="surface-card p-5 flex flex-col items-center justify-center gap-3 text-center cursor-pointer"
-                                    style={{ border: "1px dashed hsl(150 15% 18%)" }}
+                                    style={{ border: "1px dashed var(--input-border)" }}
                                     onClick={() => setShowCreate(true)}>
                                     <div className="h-10 w-10 rounded-full flex items-center justify-center"
                                         style={{ background: "var(--green-dim)" }}>
                                         <Plus className="h-5 w-5" style={{ color: "var(--green)" }} />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-bold" style={{ color: "hsl(150 10% 80%)" }}>Can't find your tribe?</div>
-                                        <div className="text-xs mt-1" style={{ color: "hsl(150 10% 45%)" }}>Create a custom club and invite members</div>
+                                        <div className="text-sm font-bold" style={{ color: "var(--btn-secondary-text)" }}>Can't find your tribe?</div>
+                                        <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Create a custom club and invite members</div>
                                     </div>
                                 </div>
                             </div>
@@ -338,47 +338,47 @@ export function Clubs() {
                         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)" }}>
                             <div className="surface-card p-6 w-full max-w-md mx-4">
                                 <div className="flex items-center justify-between mb-5">
-                                    <h2 className="text-lg font-bold" style={{ color: "hsl(150 10% 90%)" }}>Create a New Club</h2>
-                                    <button onClick={() => setShowCreate(false)} style={{ color: "hsl(150 10% 50%)" }}>
+                                    <h2 className="text-lg font-bold" style={{ color: "var(--text-heading)" }}>Create a New Club</h2>
+                                    <button onClick={() => setShowCreate(false)} style={{ color: "var(--text-secondary)" }}>
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); createMutation.mutate(form) }} className="flex flex-col gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Club Name *</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Club Name *</label>
                                         <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                             placeholder="e.g. Early Risers Club"
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }} />
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }} />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description *</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Description *</label>
                                         <textarea required value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                                             placeholder="What's this club about?"
                                             rows={3}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }} />
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }} />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Category</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Category</label>
                                         <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}>
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}>
                                             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>
 
                                     {/* Privacy Toggle */}
                                     <div>
-                                        <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Privacy</label>
+                                        <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-tertiary)" }}>Privacy</label>
                                         <div className="flex gap-3">
                                             <button type="button"
                                                 onClick={() => setForm(f => ({ ...f, isPublic: true }))}
                                                 className="flex-1 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all"
                                                 style={{
-                                                    background: form.isPublic ? "var(--green-dim)" : "hsl(150 15% 10%)",
-                                                    color: form.isPublic ? "var(--green)" : "hsl(150 10% 55%)",
-                                                    border: form.isPublic ? "1px solid rgba(19,236,106,0.3)" : "1px solid hsl(150 15% 16%)",
+                                                    background: form.isPublic ? "var(--green-dim)" : "var(--surface-2)",
+                                                    color: form.isPublic ? "var(--green)" : "var(--text-tertiary)",
+                                                    border: form.isPublic ? "1px solid rgba(19,236,106,0.3)" : "1px solid var(--input-border)",
                                                 }}>
                                                 <Globe className="h-3.5 w-3.5" />
                                                 Public
@@ -387,15 +387,15 @@ export function Clubs() {
                                                 onClick={() => setForm(f => ({ ...f, isPublic: false }))}
                                                 className="flex-1 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all"
                                                 style={{
-                                                    background: !form.isPublic ? "rgba(245,158,11,0.12)" : "hsl(150 15% 10%)",
-                                                    color: !form.isPublic ? "#f59e0b" : "hsl(150 10% 55%)",
-                                                    border: !form.isPublic ? "1px solid rgba(245,158,11,0.3)" : "1px solid hsl(150 15% 16%)",
+                                                    background: !form.isPublic ? "rgba(245,158,11,0.12)" : "var(--surface-2)",
+                                                    color: !form.isPublic ? "#f59e0b" : "var(--text-tertiary)",
+                                                    border: !form.isPublic ? "1px solid rgba(245,158,11,0.3)" : "1px solid var(--input-border)",
                                                 }}>
                                                 <Lock className="h-3.5 w-3.5" />
                                                 Private
                                             </button>
                                         </div>
-                                        <p className="text-xs mt-1.5" style={{ color: "hsl(150 10% 40%)" }}>
+                                        <p className="text-xs mt-1.5" style={{ color: "var(--text-muted)" }}>
                                             {form.isPublic
                                                 ? "Anyone can discover and join this club."
                                                 : "Invite-only. A unique invite code will be generated."}
@@ -411,12 +411,12 @@ export function Clubs() {
                                     <div className="flex gap-2">
                                         <button type="submit" disabled={createMutation.isPending}
                                             className="flex-1 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-                                            style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                                            style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                                             {createMutation.isPending ? "Creating..." : "Create Club"}
                                         </button>
                                         <button type="button" onClick={() => setShowCreate(false)}
                                             className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                            style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 70%)" }}>
+                                            style={{ background: "var(--surface-3)", color: "var(--text-label)" }}>
                                             Cancel
                                         </button>
                                     </div>
@@ -433,27 +433,27 @@ export function Clubs() {
                                     style={{ background: "rgba(245,158,11,0.15)" }}>
                                     <Lock className="h-6 w-6" style={{ color: "#f59e0b" }} />
                                 </div>
-                                <h2 className="text-lg font-bold mb-1" style={{ color: "hsl(150 10% 90%)" }}>
+                                <h2 className="text-lg font-bold mb-1" style={{ color: "var(--text-heading)" }}>
                                     Private Club Created!
                                 </h2>
-                                <p className="text-xs mb-5" style={{ color: "hsl(150 10% 50%)" }}>
+                                <p className="text-xs mb-5" style={{ color: "var(--text-secondary)" }}>
                                     Share this invite code with members. They'll need it to join <strong>{createdClub.name}</strong>.
                                 </p>
                                 <div className="flex items-center gap-3 p-4 rounded-xl mb-5"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid rgba(245,158,11,0.3)" }}>
+                                    style={{ background: "var(--surface-2)", border: "1px solid rgba(245,158,11,0.3)" }}>
                                     <span className="flex-1 text-2xl font-mono font-extrabold tracking-widest"
                                         style={{ color: "#f59e0b" }}>
                                         {createdClub.inviteCode}
                                     </span>
                                     <button onClick={copyInviteCode}
                                         className="p-2 rounded-lg transition-all"
-                                        style={{ background: codeCopied ? "rgba(19,236,106,0.15)" : "hsl(150 15% 14%)", color: codeCopied ? "var(--green)" : "hsl(150 10% 55%)" }}>
+                                        style={{ background: codeCopied ? "rgba(19,236,106,0.15)" : "hsl(var(--border))", color: codeCopied ? "var(--green)" : "var(--text-tertiary)" }}>
                                         {codeCopied ? <CheckCircle2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                                     </button>
                                 </div>
                                 <button onClick={() => setCreatedClub(null)}
                                     className="w-full py-2 rounded-lg text-sm font-semibold"
-                                    style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                                    style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                                     Got it!
                                 </button>
                             </div>
@@ -465,16 +465,16 @@ export function Clubs() {
                         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)" }}>
                             <div className="surface-card p-6 w-full max-w-sm mx-4">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-base font-bold" style={{ color: "hsl(150 10% 90%)" }}>
+                                    <h2 className="text-base font-bold" style={{ color: "var(--text-heading)" }}>
                                         Enter Invite Code
                                     </h2>
                                     <button onClick={() => { setJoinModal(null); setInviteCodeInput(""); setJoinError("") }}
-                                        style={{ color: "hsl(150 10% 50%)" }}>
+                                        style={{ color: "var(--text-secondary)" }}>
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
-                                <p className="text-xs mb-4" style={{ color: "hsl(150 10% 50%)" }}>
-                                    <strong style={{ color: "hsl(150 10% 80%)" }}>{joinModal.clubName}</strong> is a private club. Enter the invite code to request membership.
+                                <p className="text-xs mb-4" style={{ color: "var(--text-secondary)" }}>
+                                    <strong style={{ color: "var(--btn-secondary-text)" }}>{joinModal.clubName}</strong> is a private club. Enter the invite code to request membership.
                                 </p>
                                 <input
                                     autoFocus
@@ -484,7 +484,7 @@ export function Clubs() {
                                     placeholder="e.g. ABC123"
                                     maxLength={8}
                                     className="w-full px-3 py-3 rounded-lg text-center text-xl font-mono font-bold tracking-widest outline-none mb-3"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                 />
                                 {joinError && (
                                     <p className="text-xs mb-3" style={{ color: "#ef4444" }}>{joinError}</p>
@@ -493,12 +493,12 @@ export function Clubs() {
                                     <button onClick={submitPrivateJoin}
                                         disabled={!inviteCodeInput.trim() || joinMutation.isPending}
                                         className="flex-1 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-                                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                                         {joinMutation.isPending ? "Joining..." : "Join Club"}
                                     </button>
                                     <button onClick={() => { setJoinModal(null); setInviteCodeInput(""); setJoinError("") }}
                                         className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                        style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 70%)" }}>
+                                        style={{ background: "var(--surface-3)", color: "var(--text-label)" }}>
                                         Cancel
                                     </button>
                                 </div>
@@ -511,15 +511,15 @@ export function Clubs() {
                             <div className="surface-card p-6 w-full max-w-sm mx-4 rounded-2xl"
                                 style={{ border: "1px solid rgba(19,236,106,0.25)", boxShadow: "0 0 30px rgba(19,236,106,0.1)" }}>
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-base font-bold" style={{ color: "hsl(150 10% 90%)" }}>
+                                    <h2 className="text-base font-bold" style={{ color: "var(--text-heading)" }}>
                                         Join Club by Invite Code
                                     </h2>
                                     <button onClick={() => { setShowJoinByCode(false); setGlobalCode(""); setGlobalCodeError("") }}
-                                        style={{ color: "hsl(150 10% 50%)" }}>
+                                        style={{ color: "var(--text-secondary)" }}>
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
-                                <p className="text-xs mb-4" style={{ color: "hsl(150 10% 50%)" }}>
+                                <p className="text-xs mb-4" style={{ color: "var(--text-secondary)" }}>
                                     Enter the invite code for a private club to request membership.
                                 </p>
                                 <input
@@ -530,7 +530,7 @@ export function Clubs() {
                                     placeholder="e.g. ABC123"
                                     maxLength={8}
                                     className="w-full px-3 py-3 rounded-lg text-center text-xl font-mono font-bold tracking-widest outline-none mb-3"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                 />
                                 {globalCodeError && (
                                     <p className="text-xs mb-3" style={{ color: "#ef4444" }}>{globalCodeError}</p>
@@ -540,12 +540,12 @@ export function Clubs() {
                                         onClick={() => joinByCodeMutation.mutate(globalCode.trim())}
                                         disabled={!globalCode.trim() || joinByCodeMutation.isPending}
                                         className="flex-1 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-                                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                                         {joinByCodeMutation.isPending ? "Joining..." : "Join Club"}
                                     </button>
                                     <button onClick={() => { setShowJoinByCode(false); setGlobalCode(""); setGlobalCodeError("") }}
                                         className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                        style={{ background: "hsl(150 15% 12%)", color: "hsl(150 10% 70%)" }}>
+                                        style={{ background: "var(--surface-3)", color: "var(--text-label)" }}>
                                         Cancel
                                     </button>
                                 </div>

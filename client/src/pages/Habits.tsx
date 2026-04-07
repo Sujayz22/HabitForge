@@ -68,7 +68,7 @@ function ClubHabitsCard({ club, completingId, loggedIds, onLogClubHabit, navigat
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Target className="h-4 w-4" style={{ color: "var(--green)" }} />
-                    <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 60%)" }}>
+                    <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                         {club.name} · Club Challenges
                     </h3>
                 </div>
@@ -87,13 +87,13 @@ function ClubHabitsCard({ club, completingId, loggedIds, onLogClubHabit, navigat
 
                     return (
                         <div key={habit._id} className="flex items-center gap-3 p-3 rounded-xl"
-                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 12% 14%)" }}>
+                            style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
                             <button
                                 className={`complete-btn ${isDone ? "completed" : ""}`}
                                 disabled={isDone}
                                 onClick={() => { if (!isDone) onLogClubHabit(club._id, habit._id, habit.name) }}
                                 title={isDone ? "Logged today" : "Mark as done"}>
-                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                                {isDone && <CheckCircle2 className="h-4 w-4" style={{ color: "var(--save-btn-text)" }} />}
                             </button>
                             <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
                                 style={{ background: hBg, color: hColor }}>
@@ -101,11 +101,11 @@ function ClubHabitsCard({ club, completingId, loggedIds, onLogClubHabit, navigat
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className={`text-sm font-semibold truncate ${isDone ? "line-through opacity-50" : ""}`}
-                                    style={{ color: "hsl(150 10% 90%)" }}>{habit.name}</div>
+                                    style={{ color: "var(--text-heading)" }}>{habit.name}</div>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <span className="text-xs px-1.5 py-0.5 rounded font-semibold"
                                         style={{ background: hBg, color: hColor }}>{habit.category}</span>
-                                    <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{habit.frequency}</span>
+                                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{habit.frequency}</span>
                                 </div>
                             </div>
                         </div>
@@ -135,7 +135,7 @@ function ClubChallengesWrapper({ clubs, completingClubHabitId, loggedClubHabitId
     return (
         <div className="flex flex-col gap-3">
             {totalHabits > 0 && (
-                <h3 className="text-xs font-bold uppercase tracking-wider px-1" style={{ color: "hsl(150 10% 40%)" }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider px-1" style={{ color: "var(--text-muted)" }}>
                     🏆 Club Challenges
                 </h3>
             )}
@@ -330,10 +330,10 @@ export function Habits() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>
+                    <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>
                         Habit Configuration
                     </h1>
-                    <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                         Manage your habit protocols and behavioral mode
                     </p>
                 </div>
@@ -348,7 +348,7 @@ export function Habits() {
                         }
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                    style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}
+                    style={{ background: "var(--green)", color: "var(--save-btn-text)" }}
                 >
                     <Plus className="h-4 w-4" />
                     New Protocol
@@ -367,44 +367,44 @@ export function Habits() {
                             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="col-span-2">
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Habit Name *</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Habit Name *</label>
                                         <input
                                             required
                                             value={form.name}
                                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                             placeholder="e.g. Morning Run"
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none focus:ring-1"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Description</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Description</label>
                                         <input
                                             value={form.description}
                                             onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                                             placeholder="Optional description"
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Category</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Category</label>
                                         <select
                                             value={form.category}
                                             onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         >
                                             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Frequency</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Frequency</label>
                                         <select
                                             value={form.frequency}
                                             onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         >
                                             {FREQUENCIES.map(f => <option key={f} value={f}>{f}</option>)}
                                         </select>
@@ -412,16 +412,16 @@ export function Habits() {
                                     {/* Custom days selector */}
                                     {form.frequency === "CUSTOM" && (
                                         <div className="col-span-2">
-                                            <label className="text-xs font-semibold mb-2 block" style={{ color: "hsl(150 10% 55%)" }}>Select Days</label>
+                                            <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-tertiary)" }}>Select Days</label>
                                             <div className="flex gap-1 flex-wrap">
                                                 {DAYS.map((day, idx) => (
                                                     <button key={idx} type="button"
                                                         onClick={() => toggleDay(idx)}
                                                         className="px-2 py-1 rounded-lg text-xs font-semibold transition-all"
                                                         style={{
-                                                            background: form.targetDays.includes(idx) ? "var(--green-dim)" : "hsl(150 15% 10%)",
-                                                            color: form.targetDays.includes(idx) ? "var(--green)" : "hsl(150 10% 50%)",
-                                                            border: form.targetDays.includes(idx) ? "1px solid rgba(19,236,106,0.3)" : "1px solid hsl(150 15% 16%)"
+                                                            background: form.targetDays.includes(idx) ? "var(--green-dim)" : "var(--surface-2)",
+                                                            color: form.targetDays.includes(idx) ? "var(--green)" : "var(--text-secondary)",
+                                                            border: form.targetDays.includes(idx) ? "1px solid rgba(19,236,106,0.3)" : "1px solid var(--input-border)"
                                                         }}>
                                                         {day}
                                                     </button>
@@ -430,24 +430,24 @@ export function Habits() {
                                         </div>
                                     )}
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Difficulty</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Difficulty</label>
                                         <select
                                             value={form.difficulty}
                                             onChange={e => setForm(f => ({ ...f, difficulty: Number(e.target.value) }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         >
                                             {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "hsl(150 10% 55%)" }}>Target Value</label>
+                                        <label className="text-xs font-semibold mb-1 block" style={{ color: "var(--text-tertiary)" }}>Target Value</label>
                                         <input
                                             type="number" min={1}
                                             value={form.targetValue}
                                             onChange={e => setForm(f => ({ ...f, targetValue: Number(e.target.value) }))}
                                             className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                                            style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                            style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                         />
                                     </div>
                                 </div>
@@ -455,14 +455,14 @@ export function Habits() {
                                     <button type="submit"
                                         disabled={createMutation.isPending || updateMutation.isPending}
                                         className="flex-1 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
-                                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                                         {editingHabit
                                             ? (updateMutation.isPending ? "Saving..." : "Save Changes")
                                             : (createMutation.isPending ? "Creating..." : "Create Habit")}
                                     </button>
                                     <button type="button" onClick={closeForm}
                                         className="px-4 py-2 rounded-lg text-sm font-semibold"
-                                        style={{ background: "hsl(150 15% 10%)", color: "hsl(150 10% 60%)" }}>
+                                        style={{ background: "var(--surface-2)", color: "var(--text-tertiary)" }}>
                                         Cancel
                                     </button>
                                 </div>
@@ -472,14 +472,14 @@ export function Habits() {
 
                     {/* Personal Habits List */}
                     <div className="surface-card p-5">
-                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 60%)" }}>
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-tertiary)" }}>
                             Active Protocols ({habits.length})
                         </h3>
                         {isLoading ? (
-                            <div className="text-sm py-4" style={{ color: "hsl(150 10% 40%)" }}>Loading...</div>
+                            <div className="text-sm py-4" style={{ color: "var(--text-muted)" }}>Loading...</div>
                         ) : habits.length === 0 ? (
                             <div className="text-center py-8">
-                                <div className="text-sm mb-2" style={{ color: "hsl(150 10% 40%)" }}>No habits configured yet.</div>
+                                <div className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>No habits configured yet.</div>
                                 <button onClick={() => setShowCreate(true)} className="text-sm underline" style={{ color: "var(--green)" }}>
                                     Create your first protocol →
                                 </button>
@@ -501,12 +501,12 @@ export function Habits() {
                                                     }
                                                 }}
                                             >
-                                                {done && <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(150 30% 4%)" }} />}
+                                                {done && <CheckCircle2 className="h-4 w-4" style={{ color: "var(--save-btn-text)" }} />}
                                             </button>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
                                                     <span className={`text-sm font-semibold ${done ? "line-through opacity-50" : ""}`}
-                                                        style={{ color: "hsl(150 10% 90%)" }}>
+                                                        style={{ color: "var(--text-heading)" }}>
                                                         {habit.name}
                                                     </span>
                                                     <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
@@ -521,7 +521,7 @@ export function Habits() {
                                                     <span className="text-xs flex items-center gap-1" style={{ color: "var(--green)" }}>
                                                         <Zap className="h-3 w-3" /> {habit.xpValue || 10} XP
                                                     </span>
-                                                    <span className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>
+                                                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                                                         {habit.frequency === "CUSTOM" && habit.targetDays && habit.targetDays.length > 0
                                                             ? formatTargetDays(habit.targetDays)
                                                             : habit.frequency}
@@ -531,12 +531,12 @@ export function Habits() {
                                             <div className="flex items-center gap-1 flex-shrink-0">
                                                 <button onClick={() => startEdit(habit)}
                                                     className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-                                                    style={{ color: "hsl(150 10% 45%)" }}>
+                                                    style={{ color: "var(--text-muted)" }}>
                                                     <Pencil className="h-3.5 w-3.5" />
                                                 </button>
                                                 <button onClick={() => deleteMutation.mutate(habit._id)}
                                                     className="p-1.5 rounded-lg transition-colors hover:bg-red-500/10"
-                                                    style={{ color: "hsl(0 60% 55%)" }}>
+                                                    style={{ color: "var(--danger)" }}>
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </button>
                                             </div>
@@ -565,18 +565,18 @@ export function Habits() {
                 {/* Right: Mode Selector */}
                 <div className="flex flex-col gap-4">
                     <div className="surface-card p-5">
-                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 60%)" }}>
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-tertiary)" }}>
                             Behavioral Mode
                         </h3>
                         <div className="flex flex-col gap-3">
                             {modes.map((mode) => (
                                 <div key={mode.id} className="p-3 rounded-lg cursor-pointer transition-all"
-                                    style={{ background: "hsl(150 15% 10%)", border: `1px solid hsl(150 12% 16%)` }}>
+                                    style={{ background: "var(--surface-2)", border: `1px solid hsl(var(--border))` }}>
                                     <div className="flex items-center gap-2 mb-1">
                                         <mode.icon className="h-4 w-4" style={{ color: mode.color }} />
-                                        <span className="text-sm font-semibold" style={{ color: "hsl(150 10% 85%)" }}>{mode.label}</span>
+                                        <span className="text-sm font-semibold" style={{ color: "var(--text-body)" }}>{mode.label}</span>
                                     </div>
-                                    <p className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>{mode.desc}</p>
+                                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>{mode.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -584,20 +584,20 @@ export function Habits() {
 
                     {/* Stats Summary */}
                     <div className="surface-card p-5">
-                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 60%)" }}>
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-tertiary)" }}>
                             Your Performance
                         </h3>
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>Total Habits</span>
-                                <span className="text-sm font-bold" style={{ color: "hsl(150 10% 85%)" }}>{habits.length}</span>
+                                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Total Habits</span>
+                                <span className="text-sm font-bold" style={{ color: "var(--text-body)" }}>{habits.length}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>Completed Today</span>
+                                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Completed Today</span>
                                 <span className="text-sm font-bold" style={{ color: "var(--green)" }}>{todayCompletedIds.size}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>Completion Rate</span>
+                                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Completion Rate</span>
                                 <span className="text-sm font-bold" style={{ color: "var(--green)" }}>
                                     {habits.length > 0 ? Math.round((todayCompletedIds.size / habits.length) * 100) : 0}%
                                 </span>

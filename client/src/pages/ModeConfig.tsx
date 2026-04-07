@@ -96,7 +96,7 @@ export function ModeConfig() {
             {/* Toast */}
             {toast && (
                 <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold animate-fade-in-up"
-                    style={{ background: "hsl(150 20% 10%)", border: "1px solid rgba(19,236,106,0.3)", color: "#13ec6a", boxShadow: "0 0 20px rgba(19,236,106,0.1)" }}>
+                    style={{ background: "var(--surface-2)", border: "1px solid rgba(19,236,106,0.3)", color: "#13ec6a", boxShadow: "0 0 20px rgba(19,236,106,0.1)" }}>
                     {toast}
                 </div>
             )}
@@ -105,10 +105,10 @@ export function ModeConfig() {
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
                     <Sliders className="h-6 w-6" style={{ color: "#13ec6a" }} />
-                    <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>HabitForge Mode</h1>
+                    <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>HabitForge Mode</h1>
                 </div>
-                <p className="text-sm" style={{ color: "hsl(150 10% 50%)" }}>
-                    Configure your behavioural protocol. Changes are locked for <strong style={{ color: "hsl(150 10% 75%)" }}>15 days</strong> after switching.
+                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                    Configure your behavioural protocol. Changes are locked for <strong style={{ color: "var(--text-label)" }}>15 days</strong> after switching.
                 </p>
             </div>
 
@@ -131,11 +131,11 @@ export function ModeConfig() {
 
                     {/* Grace Cards panel */}
                     <div className="rounded-xl px-5 py-4 mb-8"
-                        style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 12%)" }}>
+                        style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
                         <div className="flex items-center gap-2 mb-4">
                             <ShieldCheck className="h-4 w-4" style={{ color: "#13ec6a" }} />
-                            <span className="text-sm font-bold" style={{ color: "hsl(150 10% 85%)" }}>Grace Cards</span>
-                            <span className="text-xs ml-auto" style={{ color: "hsl(150 10% 40%)" }}>Earned at streak milestones</span>
+                            <span className="text-sm font-bold" style={{ color: "var(--text-body)" }}>Grace Cards</span>
+                            <span className="text-xs ml-auto" style={{ color: "var(--text-muted)" }}>Earned at streak milestones</span>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <GraceCard
@@ -167,8 +167,8 @@ export function ModeConfig() {
                                 <div key={mode.id}
                                     className="rounded-2xl p-5 transition-all"
                                     style={{
-                                        background: isActive ? mode.glow : "hsl(150 20% 7%)",
-                                        border: `1px solid ${isActive ? mode.border : "hsl(150 15% 12%)"}`,
+                                        background: isActive ? mode.glow : "var(--surface)",
+                                        border: `1px solid ${isActive ? mode.border : "var(--surface-3)"}`,
                                         boxShadow: isActive ? `0 0 24px ${mode.glow}` : "none",
                                     }}>
                                     {/* Mode header */}
@@ -176,7 +176,7 @@ export function ModeConfig() {
                                         <div>
                                             <div className="flex items-center gap-2">
                                                 {isActive && <CheckCircle2 className="h-4 w-4" style={{ color: mode.color }} />}
-                                                <span className="font-extrabold" style={{ color: isActive ? mode.color : "hsl(150 10% 85%)" }}>
+                                                <span className="font-extrabold" style={{ color: isActive ? mode.color : "var(--text-body)" }}>
                                                     {mode.name}
                                                 </span>
                                                 {isActive && (
@@ -186,7 +186,7 @@ export function ModeConfig() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="text-xs mt-0.5" style={{ color: isActive ? mode.color + "cc" : "hsl(150 10% 45%)" }}>
+                                            <div className="text-xs mt-0.5" style={{ color: isActive ? mode.color + "cc" : "var(--text-muted)" }}>
                                                 {mode.subtitle}
                                             </div>
                                         </div>
@@ -196,9 +196,9 @@ export function ModeConfig() {
                                                 onClick={() => canChange ? setConfirmMode(mode.id) : showToast(`Mode locked for ${modeInfo.daysRemaining} more day(s).`)}
                                                 className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl transition-all hover:scale-105"
                                                 style={{
-                                                    background: canChange ? "hsl(150 20% 11%)" : "hsl(150 20% 8%)",
-                                                    border: `1px solid ${canChange ? mode.border : "hsl(150 15% 13%)"}`,
-                                                    color: canChange ? mode.color : "hsl(150 10% 40%)",
+                                                    background: canChange ? "var(--surface-3)" : "var(--surface)",
+                                                    border: `1px solid ${canChange ? mode.border : "var(--divider)"}`,
+                                                    color: canChange ? mode.color : "var(--text-muted)",
                                                 }}>
                                                 {canChange ? "Switch" : <><Clock className="h-3 w-3" /> Locked</>}
                                                 {canChange && <ChevronRight className="h-3 w-3" />}
@@ -206,13 +206,13 @@ export function ModeConfig() {
                                         )}
                                     </div>
 
-                                    <p className="text-xs mb-4 leading-relaxed" style={{ color: "hsl(150 10% 50%)" }}>{mode.description}</p>
+                                    <p className="text-xs mb-4 leading-relaxed" style={{ color: "var(--text-secondary)" }}>{mode.description}</p>
 
                                     {/* Rules */}
                                     <div className="grid grid-cols-2 gap-2">
                                         {mode.rules.map((r, i) => (
                                             <div key={i} className="flex items-start gap-2 text-xs"
-                                                style={{ color: "hsl(150 10% 60%)" }}>
+                                                style={{ color: "var(--text-tertiary)" }}>
                                                 <span>{r.icon}</span>
                                                 <span>{r.text}</span>
                                             </div>
@@ -229,23 +229,23 @@ export function ModeConfig() {
             {confirmMode && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.8)" }}>
                     <div className="max-w-sm w-full mx-4 rounded-2xl p-6"
-                        style={{ background: "hsl(150 20% 7%)", border: "1px solid rgba(234,179,8,0.3)" }}>
+                        style={{ background: "var(--surface)", border: "1px solid rgba(234,179,8,0.3)" }}>
                         <AlertTriangle className="h-6 w-6 mb-3" style={{ color: "#eab308" }} />
-                        <h3 className="text-base font-extrabold mb-2" style={{ color: "hsl(150 10% 92%)" }}>Confirm Mode Change</h3>
-                        <p className="text-sm mb-5" style={{ color: "hsl(150 10% 55%)" }}>
-                            Switching to <strong style={{ color: "hsl(150 10% 85%)" }}>{MODES.find(m => m.id === confirmMode)?.name}</strong> will lock your mode for <strong style={{ color: "#eab308" }}>15 days</strong>. Are you sure?
+                        <h3 className="text-base font-extrabold mb-2" style={{ color: "var(--text-primary)" }}>Confirm Mode Change</h3>
+                        <p className="text-sm mb-5" style={{ color: "var(--text-tertiary)" }}>
+                            Switching to <strong style={{ color: "var(--text-body)" }}>{MODES.find(m => m.id === confirmMode)?.name}</strong> will lock your mode for <strong style={{ color: "#eab308" }}>15 days</strong>. Are you sure?
                         </p>
                         <div className="flex gap-3">
                             <button onClick={() => setConfirmMode(null)}
                                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold"
-                                style={{ background: "hsl(150 20% 10%)", border: "1px solid hsl(150 15% 15%)", color: "hsl(150 10% 55%)" }}>
+                                style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-tertiary)" }}>
                                 Cancel
                             </button>
                             <button
                                 onClick={() => changeMutation.mutate(confirmMode!)}
                                 disabled={changeMutation.isPending}
                                 className="flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-                                style={{ background: "#13ec6a", color: "hsl(150 30% 4%)" }}>
+                                style={{ background: "#13ec6a", color: "var(--save-btn-text)" }}>
                                 {changeMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
                                 Confirm Switch
                             </button>
@@ -264,19 +264,19 @@ interface GraceCardProps {
 
 function GraceCard({ label, count, color, glow, description, earned, onUse }: GraceCardProps) {
     return (
-        <div className="rounded-xl px-4 py-3" style={{ background: "hsl(150 20% 9%)", border: "1px solid hsl(150 15% 14%)" }}>
+        <div className="rounded-xl px-4 py-3" style={{ background: "var(--surface-2)", border: "1px solid hsl(var(--border))" }}>
             <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold" style={{ color }}>{label}</span>
                 <span className="text-lg font-extrabold" style={{ color }}>{count}</span>
             </div>
-            <p className="text-[11px] mb-1" style={{ color: "hsl(150 10% 45%)" }}>{description}</p>
-            <p className="text-[10px] mb-2" style={{ color: "hsl(150 10% 35%)" }}>{earned}</p>
+            <p className="text-[11px] mb-1" style={{ color: "var(--text-muted)" }}>{description}</p>
+            <p className="text-[10px] mb-2" style={{ color: "var(--text-muted)" }}>{earned}</p>
             <button onClick={onUse} disabled={count === 0}
                 className="w-full py-1.5 rounded-lg text-xs font-bold transition-all"
                 style={{
-                    background: count > 0 ? glow : "hsl(150 20% 10%)",
-                    border: `1px solid ${count > 0 ? color + "40" : "hsl(150 15% 13%)"}`,
-                    color: count > 0 ? color : "hsl(150 10% 35%)",
+                    background: count > 0 ? glow : "var(--surface-2)",
+                    border: `1px solid ${count > 0 ? color + "40" : "var(--divider)"}`,
+                    color: count > 0 ? color : "var(--text-muted)",
                 }}>
                 {count > 0 ? "Use on Dashboard" : "None available"}
             </button>

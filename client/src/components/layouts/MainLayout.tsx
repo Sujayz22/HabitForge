@@ -59,27 +59,27 @@ export function MainLayout() {
     }
 
     return (
-        <div className="flex min-h-screen w-full" style={{ background: "hsl(150 30% 4%)" }}>
+        <div className="flex min-h-screen w-full" style={{ background: "hsl(var(--background))" }}>
 
             {/* ── Desktop Sidebar ──────────────────────────────────── */}
             <aside
                 className="hidden md:flex fixed inset-y-0 left-0 z-40 w-56 flex-col"
                 style={{
-                    background: "hsl(150 20% 6%)",
-                    borderRight: "1px solid hsl(150 15% 11%)"
+                    background: "var(--surface)",
+                    borderRight: "1px solid var(--divider)"
                 }}
             >
                 {/* Logo */}
                 <div className="flex items-center gap-3 px-5 py-5"
-                    style={{ borderBottom: "1px solid hsl(150 15% 11%)" }}>
+                    style={{ borderBottom: "1px solid var(--divider)" }}>
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg"
-                        style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                        style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                         <Zap className="h-4 w-4" fill="currentColor" />
                     </div>
                     <div style={{
                         fontFamily: "'Press Start 2P', cursive",
                         fontSize: "13px",
-                        color: "hsl(150 10% 95%)",
+                        color: "var(--text-primary)",
                         letterSpacing: "0.02em",
                         lineHeight: 1.4
                     }}>HabitForge</div>
@@ -101,7 +101,7 @@ export function MainLayout() {
 
                 {/* Bottom: Settings + User */}
                 <div className="px-3 pb-4 flex flex-col gap-1"
-                    style={{ borderTop: "1px solid hsl(150 15% 11%)" }}>
+                    style={{ borderTop: "1px solid var(--divider)" }}>
                     <div className="pt-3">
                         <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                             <Settings className="h-4 w-4 flex-shrink-0" />
@@ -110,7 +110,7 @@ export function MainLayout() {
                         <button
                             onClick={handleLogout}
                             className="nav-item w-full text-left mt-1"
-                            style={{ color: "hsl(0 60% 55%)" }}
+                            style={{ color: "var(--danger)" }}
                         >
                             <LogOut className="h-4 w-4 flex-shrink-0" />
                             <span>Logout</span>
@@ -119,13 +119,13 @@ export function MainLayout() {
 
                     {/* User card */}
                     <div className="flex items-center gap-3 mt-3 px-2 py-2 rounded-lg"
-                        style={{ background: "hsl(150 15% 10%)" }}>
+                        style={{ background: "var(--surface-2)" }}>
                         <UserAvatar size={8} textSize="text-xs" />
                         <div className="min-w-0">
-                            <div className="text-sm font-semibold truncate" style={{ color: "hsl(150 10% 90%)" }}>
+                            <div className="text-sm font-semibold truncate" style={{ color: "var(--text-heading)" }}>
                                 {user?.username || "User"}
                             </div>
-                            <div className="text-xs" style={{ color: "hsl(150 10% 50%)" }}>
+                            <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                                 LVL {user?.level || 1} • {user?.xp || 0} XP
                             </div>
                         </div>
@@ -139,18 +139,18 @@ export function MainLayout() {
                 {/* Mobile sticky top bar */}
                 <div
                     className="md:hidden sticky top-0 z-20 flex items-center justify-between px-4 py-3"
-                    style={{ background: "hsl(150 20% 6%)", borderBottom: "1px solid hsl(150 15% 11%)" }}
+                    style={{ background: "var(--surface)", borderBottom: "1px solid var(--divider)" }}
                 >
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg"
-                            style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                            style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                             <Zap className="h-3.5 w-3.5" fill="currentColor" />
                         </div>
                         <span style={{
                             fontFamily: "'Press Start 2P', cursive",
                             fontSize: "12px",
-                            color: "hsl(150 10% 95%)",
+                            color: "var(--text-primary)",
                             letterSpacing: "0.02em"
                         }}>HabitForge</span>
                     </div>
@@ -160,14 +160,14 @@ export function MainLayout() {
                         <button
                             onClick={() => setAvatarMenuOpen(v => !v)}
                             className="flex items-center gap-2 rounded-xl px-2 py-1 transition-colors"
-                            style={{ background: avatarMenuOpen ? "hsl(150 15% 12%)" : "transparent" }}
+                            style={{ background: avatarMenuOpen ? "var(--surface-3)" : "transparent" }}
                         >
                             <UserAvatar size={8} textSize="text-xs" />
                             <div className="text-left hidden xs:block">
-                                <div className="text-xs font-semibold leading-tight" style={{ color: "hsl(150 10% 85%)" }}>
+                                <div className="text-xs font-semibold leading-tight" style={{ color: "var(--text-body)" }}>
                                     {user?.username}
                                 </div>
-                                <div className="text-[10px]" style={{ color: "hsl(150 10% 45%)" }}>
+                                <div className="text-[10px]" style={{ color: "var(--text-muted)" }}>
                                     LVL {user?.level || 1}
                                 </div>
                             </div>
@@ -178,17 +178,17 @@ export function MainLayout() {
                             <div
                                 className="absolute right-0 top-full mt-2 w-44 rounded-xl overflow-hidden shadow-xl z-50"
                                 style={{
-                                    background: "hsl(150 20% 8%)",
-                                    border: "1px solid hsl(150 15% 14%)",
-                                    boxShadow: "0 8px 32px rgba(0,0,0,0.5)"
+                                    background: "var(--surface)",
+                                    border: "1px solid hsl(var(--border))",
+                                    boxShadow: "0 8px 32px rgba(0,0,0,0.15)"
                                 }}
                             >
                                 {/* User info pill */}
-                                <div className="px-3 py-3" style={{ borderBottom: "1px solid hsl(150 15% 12%)" }}>
-                                    <div className="text-sm font-semibold" style={{ color: "hsl(150 10% 90%)" }}>
+                                <div className="px-3 py-3" style={{ borderBottom: "1px solid var(--divider)" }}>
+                                    <div className="text-sm font-semibold" style={{ color: "var(--text-heading)" }}>
                                         {user?.username}
                                     </div>
-                                    <div className="text-xs" style={{ color: "hsl(150 10% 45%)" }}>
+                                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>
                                         LVL {user?.level || 1} • {user?.xp || 0} XP
                                     </div>
                                 </div>
@@ -196,8 +196,10 @@ export function MainLayout() {
                                 <NavLink
                                     to="/mode"
                                     onClick={() => setAvatarMenuOpen(false)}
-                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors hover:bg-white/5"
-                                    style={{ color: "hsl(150 10% 75%)" }}
+                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors"
+                                    style={{ color: "var(--text-label)" }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "var(--surface-2)")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                                 >
                                     <Sliders className="h-4 w-4 flex-shrink-0" />
                                     Mode Config
@@ -206,19 +208,23 @@ export function MainLayout() {
                                 <NavLink
                                     to="/settings"
                                     onClick={() => setAvatarMenuOpen(false)}
-                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors hover:bg-white/5"
-                                    style={{ color: "hsl(150 10% 75%)" }}
+                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors"
+                                    style={{ color: "var(--text-label)" }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "var(--surface-2)")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                                 >
                                     <Settings className="h-4 w-4 flex-shrink-0" />
                                     Settings
                                 </NavLink>
                                 {/* Divider */}
-                                <div style={{ borderTop: "1px solid hsl(150 15% 12%)" }} />
+                                <div style={{ borderTop: "1px solid var(--divider)" }} />
                                 {/* Logout */}
                                 <button
                                     onClick={handleLogout}
-                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors hover:bg-red-500/10"
-                                    style={{ color: "hsl(0 60% 60%)" }}
+                                    className="flex items-center gap-2.5 px-3 py-2.5 w-full text-sm transition-colors"
+                                    style={{ color: "var(--danger-text)" }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "var(--danger-bg)")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                                 >
                                     <LogOut className="h-4 w-4 flex-shrink-0" />
                                     Logout
@@ -238,8 +244,8 @@ export function MainLayout() {
             <nav
                 className="md:hidden fixed bottom-0 inset-x-0 z-20 flex items-center justify-around px-1 py-2"
                 style={{
-                    background: "hsl(150 20% 6%)",
-                    borderTop: "1px solid hsl(150 15% 11%)",
+                    background: "var(--surface)",
+                    borderTop: "1px solid var(--divider)",
                 }}
             >
                 {bottomNavItems.map((item) => (
@@ -248,7 +254,7 @@ export function MainLayout() {
                         to={item.to}
                         className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all"
                         style={({ isActive }) => ({
-                            color: isActive ? "var(--green)" : "hsl(150 10% 45%)",
+                            color: isActive ? "var(--green)" : "var(--text-muted)",
                         })}
                     >
                         <item.icon className="h-5 w-5" />
