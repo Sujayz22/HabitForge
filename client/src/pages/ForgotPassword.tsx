@@ -24,40 +24,40 @@ export function ForgotPassword() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4"
-            style={{ background: "hsl(150 30% 4%)" }}>
+            style={{ background: "hsl(var(--background))" }}>
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <div className="flex items-center gap-3 justify-center mb-8">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl"
-                            style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}>
+                            style={{ background: "var(--green)", color: "var(--save-btn-text)" }}>
                             <Zap className="h-5 w-5" fill="currentColor" />
                         </div>
-                        <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "14px", color: "hsl(150 10% 95%)", letterSpacing: "0.02em" }}>HabitForge</span>
+                        <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "14px", color: "var(--text-primary)", letterSpacing: "0.02em" }}>HabitForge</span>
                     </div>
-                    <h1 className="text-2xl font-extrabold" style={{ color: "hsl(150 10% 95%)" }}>Forgot Password</h1>
-                    <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>
+                    <h1 className="text-2xl font-extrabold" style={{ color: "var(--text-primary)" }}>Forgot Password</h1>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                         Enter your email and we'll send a reset link
                     </p>
                 </div>
 
-                <div className="rounded-2xl p-6" style={{ background: "hsl(150 20% 7%)", border: "1px solid hsl(150 15% 13%)" }}>
+                <div className="rounded-2xl p-6" style={{ background: "var(--surface)", border: "1px solid var(--divider)" }}>
                     {status === "success" ? (
                         <div className="text-center py-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-full mx-auto mb-4"
                                 style={{ background: "var(--green-dim)" }}>
                                 <Mail className="h-6 w-6" style={{ color: "var(--green)" }} />
                             </div>
-                            <p className="font-semibold mb-1" style={{ color: "hsl(150 10% 90%)" }}>Check your inbox</p>
-                            <p className="text-sm" style={{ color: "hsl(150 10% 55%)" }}>{message}</p>
-                            <p className="text-xs mt-3" style={{ color: "hsl(150 10% 40%)" }}>
+                            <p className="font-semibold mb-1" style={{ color: "var(--text-heading)" }}>Check your inbox</p>
+                            <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>{message}</p>
+                            <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>
                                 The link expires in 1 hour. Check your spam folder if you don't see it.
                             </p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <div>
-                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "hsl(150 10% 55%)" }}>
+                                <label className="text-xs font-semibold mb-1.5 block" style={{ color: "var(--text-tertiary)" }}>
                                     Email address
                                 </label>
                                 <input
@@ -68,7 +68,7 @@ export function ForgotPassword() {
                                     required
                                     autoFocus
                                     className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                                    style={{ background: "hsl(150 15% 10%)", border: "1px solid hsl(150 15% 16%)", color: "hsl(150 10% 90%)" }}
+                                    style={{ background: "var(--surface-2)", border: "1px solid var(--input-border)", color: "var(--text-heading)" }}
                                 />
                             </div>
 
@@ -82,7 +82,7 @@ export function ForgotPassword() {
                                 type="submit"
                                 disabled={status === "loading"}
                                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold disabled:opacity-60"
-                                style={{ background: "var(--green)", color: "hsl(150 30% 4%)" }}
+                                style={{ background: "var(--green)", color: "var(--save-btn-text)" }}
                             >
                                 {status === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
                                 Send Reset Link

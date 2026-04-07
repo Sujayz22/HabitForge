@@ -34,8 +34,8 @@ export function Analytics() {
     return (
         <div className="flex flex-col gap-6">
             <div>
-                <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "hsl(150 10% 95%)" }}>Behavioral Analytics</h1>
-                <p className="text-sm mt-1" style={{ color: "hsl(150 10% 50%)" }}>Advanced insights into your habit performance</p>
+                <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-primary)" }}>Behavioral Analytics</h1>
+                <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Advanced insights into your habit performance</p>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -52,7 +52,7 @@ export function Analytics() {
                         </div>
                         <div>
                             <div className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value}</div>
-                            <div className="text-xs font-medium" style={{ color: "hsl(150 10% 50%)" }}>{stat.label}</div>
+                            <div className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>{stat.label}</div>
                         </div>
                     </div>
                 ))}
@@ -62,17 +62,17 @@ export function Analytics() {
                 <div className="surface-card p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <Zap className="h-4 w-4" style={{ color: "var(--green)" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>XP Over Time (30 days)</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>XP Over Time (30 days)</h2>
                     </div>
                     <XPChart logs={logs} days={30} />
                 </div>
                 <div className="surface-card p-5">
                     <div className="flex items-center gap-2 mb-4">
                         <BarChart2 className="h-4 w-4" style={{ color: "var(--green)" }} />
-                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>Category Breakdown</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>Category Breakdown</h2>
                     </div>
                     {Object.keys(categoryBreakdown).length === 0 ? (
-                        <div className="text-sm py-8 text-center" style={{ color: "hsl(150 10% 40%)" }}>No habits yet.</div>
+                        <div className="text-sm py-8 text-center" style={{ color: "var(--text-muted)" }}>No habits yet.</div>
                     ) : (
                         <div className="flex flex-col gap-3">
                             {Object.entries(categoryBreakdown).map(([cat, count]) => {
@@ -81,9 +81,9 @@ export function Analytics() {
                                     <div key={cat}>
                                         <div className="flex justify-between text-xs mb-1">
                                             <span style={{ color: categoryColors[cat] || "#6b7280" }}>{cat}</span>
-                                            <span style={{ color: "hsl(150 10% 55%)" }}>{count as number} ({pct}%)</span>
+                                            <span style={{ color: "var(--text-tertiary)" }}>{count as number} ({pct}%)</span>
                                         </div>
-                                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "hsl(150 15% 12%)" }}>
+                                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-3)" }}>
                                             <div className="h-full rounded-full" style={{ width: `${pct}%`, background: categoryColors[cat] || "#6b7280" }} />
                                         </div>
                                     </div>
@@ -97,34 +97,34 @@ export function Analytics() {
             <div className="surface-card p-5">
                 <div className="flex items-center gap-2 mb-4">
                     <CheckCircle2 className="h-4 w-4" style={{ color: "var(--green)" }} />
-                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "hsl(150 10% 70%)" }}>Consistency Map</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-label)" }}>Consistency Map</h2>
                 </div>
                 <ConsistencyHeatmap logs={logs} weeks={12} />
             </div>
 
             {habitStats.length > 0 && (
                 <div className="surface-card p-5">
-                    <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "hsl(150 10% 70%)" }}>Per-Habit Performance</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-label)" }}>Per-Habit Performance</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr style={{ borderBottom: "1px solid hsl(150 15% 12%)" }}>
+                                <tr style={{ borderBottom: "1px solid var(--divider)" }}>
                                     {["Habit", "Streak", "Completions", "Last Done"].map(h => (
-                                        <th key={h} className="text-left py-2 px-3 text-xs font-semibold" style={{ color: "hsl(150 10% 45%)" }}>{h}</th>
+                                        <th key={h} className="text-left py-2 px-3 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>{h}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody>
                                 {habitStats.map((hs: any) => (
-                                    <tr key={hs.habitId} style={{ borderBottom: "1px solid hsl(150 15% 10%)" }}>
-                                        <td className="py-2 px-3 font-medium" style={{ color: "hsl(150 10% 85%)" }}>{hs.name}</td>
+                                    <tr key={hs.habitId} style={{ borderBottom: "1px solid var(--divider)" }}>
+                                        <td className="py-2 px-3 font-medium" style={{ color: "var(--text-body)" }}>{hs.name}</td>
                                         <td className="py-2 px-3">
                                             <span className="flex items-center gap-1 text-xs" style={{ color: "#f97316" }}>
                                                 <Flame className="h-3 w-3" />{hs.currentStreak}d
                                             </span>
                                         </td>
                                         <td className="py-2 px-3 text-xs" style={{ color: "var(--green)" }}>{hs.totalCompletions}</td>
-                                        <td className="py-2 px-3 text-xs" style={{ color: "hsl(150 10% 45%)" }}>
+                                        <td className="py-2 px-3 text-xs" style={{ color: "var(--text-muted)" }}>
                                             {hs.lastCompleted ? new Date(hs.lastCompleted).toLocaleDateString() : "Never"}
                                         </td>
                                     </tr>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthProvider } from "@/contexts/AuthContext"
+import { ThemeProvider } from "@/contexts/ThemeContext"
 import { ToastProvider } from "@/contexts/ToastContext"
 import { useNotificationPermission } from "@/hooks/useNotifications"
 import { MainLayout } from "@/components/layouts/MainLayout"
@@ -38,41 +39,43 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ToastProvider>
-          <AppShell>
-            <BrowserRouter>
-              <Routes>
-                {/* Public Drop-in Page */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/coming-soon" element={<ComingSoon />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppShell>
+              <BrowserRouter>
+                <Routes>
+                  {/* Public Drop-in Page */}
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/coming-soon" element={<ComingSoon />} />
 
-                {/* Public Auth Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                  {/* Public Auth Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* Authenticated Dashboard Core */}
-                <Route element={
-                  <ProtectedRoute>
-                    <MainLayout />
-                  </ProtectedRoute>
-                }>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/habits" element={<Habits />} />
-                  <Route path="/tasks" element={<Tasks />} />
-                  <Route path="/clubs" element={<Clubs />} />
-                  <Route path="/clubs/:clubId" element={<ClubDetail />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/mode" element={<ModeConfig />} />
-                </Route>
-              </Routes>
-            </BrowserRouter>
-          </AppShell>
-        </ToastProvider>
-      </AuthProvider>
+                  {/* Authenticated Dashboard Core */}
+                  <Route element={
+                    <ProtectedRoute>
+                      <MainLayout />
+                    </ProtectedRoute>
+                  }>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/habits" element={<Habits />} />
+                    <Route path="/tasks" element={<Tasks />} />
+                    <Route path="/clubs" element={<Clubs />} />
+                    <Route path="/clubs/:clubId" element={<ClubDetail />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/mode" element={<ModeConfig />} />
+                  </Route>
+                </Routes>
+              </BrowserRouter>
+            </AppShell>
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
