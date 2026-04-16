@@ -23,7 +23,7 @@ async function cacheSet(key: string, value: unknown): Promise<void> {
     try {
         await redisClient.setex(key, CACHE_TTL, JSON.stringify(value));
     } catch {
-        // Silently fail — caching is best-effort
+        // Silently fail
     }
 }
 
